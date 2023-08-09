@@ -3,27 +3,16 @@ use std::f32::consts::PI;
 use bevy::{
     prelude::*,
     render::{mesh::Indices, render_resource::PrimitiveTopology},
-    sprite::MaterialMesh2dBundle,
 };
 
 mod common;
 
-use crate::common::{
-    collider::Collider, paddle::Paddle, wall_bundle::WallBundle, wall_location::WallLocation,
-};
+use crate::common::{wall_bundle::WallBundle, wall_location::WallLocation};
 
 const BACKGROUND_COLOR: Color = Color::rgb(0.9, 0.9, 0.9);
 
 #[derive(Event, Default)]
 struct CollisionEvent;
-
-const PADDLE_SIZE: Vec3 = Vec3::new(120.0, 40.0, 0.0);
-
-const GAP_BETWEEN_PADDLE_AND_FLOOR: f32 = 60.0;
-// How close can the paddle get to the wall
-
-const BOTTOM_WALL: f32 = -300.;
-const PADDLE_COLOR: Color = Color::rgb(0.3, 0.3, 0.7);
 
 fn main() {
     App::new()
@@ -35,10 +24,11 @@ fn main() {
         .add_systems(Startup, setup)
         .add_systems(Update, bevy::window::close_on_esc)
         .add_systems(Update, system)
+        .add_systems(Update, render_map)
         .run();
 }
 
-fn get_hex_vertexes(r: f32, offset: f32) -> [[f32; 3]; 6] {
+fn get_hex_vertexes(r: f32, offset: f32) -> Vec<[f32; 3]> {
     let vertex_no = 6.;
 
     let full_circle = 2. * PI;
@@ -53,26 +43,11 @@ fn get_hex_vertexes(r: f32, offset: f32) -> [[f32; 3]; 6] {
     let v4 = [x(4.), y(4.), 0.];
     let v5 = [x(5.), y(5.), 0.];
 
-    // println!("r = {}", r);
-    // println!("v0 = [{}, {}] ", v0[0], v0[1]);
-    // println!("v1 = [{}, {}] ", v1[0], v1[1]);
-    // println!("v2 = [{}, {}] ", v2[0], v2[1]);
-    // println!("v3 = [{}, {}] ", v3[0], v3[1]);
-    // println!("v4 = [{}, {}] ", v4[0], v4[1]);
-    // println!("v5 = [{}, {}] ", v5[0], v5[1]);
-
-    return [v0, v1, v2, v3, v4, v5];
+    return vec![v0, v1, v2, v3, v4, v5];
 }
 
 // TODO search fpr the wey bevy is storing positions
 fn poligon_mesh() -> Mesh {
-    let vertex_no = 6.;
-
-    let full_circle = 2. * PI;
-
-    let x = |i: f32| (i * full_circle / vertex_no).cos();
-    let y = |i: f32| (i * full_circle / vertex_no).sin();
-
     let center = ([0., 0., 0.], [0., 0., 1.], [0., 0.]);
 
     let x = |root: f32| (root * 2. * PI / 6.).cos();
@@ -131,15 +106,38 @@ fn system(mut gizmos: Gizmos, time: Res<Time>) {
     gizmos.ray_2d(Vec2::Y, Vec2::splat(80.), Color::GREEN);
 }
 
+fn render_map(
+    mut commands: Commands,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<StandardMaterial>>,
+) {
+    let center = [0., 0., 0.];
+    let mut pos_vec1 = get_hex_vertexes(1.75, PI / 6.);
+
+    pos_vec1.push(center);
+
+    let material = materials.add(Color::rgb_u8(255, 0, 0).into());
+    let mesh = meshes.add(poligon_mesh());
+
+    for pos in pos_vec1.iter() {
+        let transform = Transform::from_translation(Vec3::from_slice(pos));
+
+        commands.spawn(PbrBundle {
+            material: material.clone(),
+            mesh: mesh.clone(),
+            transform,
+            ..Default::default()
+        });
+    }
+}
+
 // Add the game's entities to our world
 fn setup(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
-    mut gizmos: Gizmos,
 ) {
     // Camera
-
     commands.spawn(Camera3dBundle {
         transform: Transform::from_translation(Vec3::new(0., 0., 10.))
             .looking_at(Vec3::ZERO, Vec3::Y),
@@ -150,90 +148,6 @@ fn setup(
         transform: Transform::from_translation(Vec3::new(0., 0., 10.)),
         ..Default::default()
     });
-
-    let [v0, v1, v2, v3, v4, v5] = get_hex_vertexes(1.75, PI / 6.);
-
-    let material = materials.add(Color::rgb_u8(255, 0, 0).into());
-    let mesh = meshes.add(poligon_mesh());
-
-    let t0 = Transform::from_translation(Vec3::from_slice(&v0));
-    let t1 = Transform::from_translation(Vec3::from_slice(&v1));
-    let t2 = Transform::from_translation(Vec3::from_slice(&v2));
-    let t3 = Transform::from_translation(Vec3::from_slice(&v3));
-    let t4 = Transform::from_translation(Vec3::from_slice(&v4));
-    let t5 = Transform::from_translation(Vec3::from_slice(&v5));
-
-    println!("[{}, {}, {}]", v0[0], v0[1], v0[2]);
-    println!("[{}, {}, {}]", v1[0], v1[1], v1[2]);
-    println!("[{}, {}, {}]", v4[0], v4[1], v4[2]);
-
-    commands.spawn(PbrBundle {
-        material: material.clone(),
-        mesh: mesh.clone(),
-        ..Default::default()
-    });
-
-    commands.spawn(PbrBundle {
-        transform: t0,
-        material: material.clone(),
-        mesh: mesh.clone(),
-        ..Default::default()
-    });
-
-    commands.spawn(PbrBundle {
-        transform: t1,
-        material: material.clone(),
-        mesh: mesh.clone(),
-        ..Default::default()
-    });
-
-    commands.spawn(PbrBundle {
-        transform: t2,
-        material: material.clone(),
-        mesh: mesh.clone(),
-        ..Default::default()
-    });
-
-    commands.spawn(PbrBundle {
-        transform: t3,
-        material: material.clone(),
-        mesh: mesh.clone(),
-        ..Default::default()
-    });
-
-    commands.spawn(PbrBundle {
-        transform: t4,
-        material: material.clone(),
-        mesh: mesh.clone(),
-        ..Default::default()
-    });
-
-    commands.spawn(PbrBundle {
-        transform: t5,
-        material: material.clone(),
-        mesh: mesh.clone(),
-        ..Default::default()
-    });
-
-    // Paddle
-    let paddle_y = BOTTOM_WALL + GAP_BETWEEN_PADDLE_AND_FLOOR;
-
-    commands.spawn((
-        SpriteBundle {
-            transform: Transform {
-                translation: Vec3::new(0.0, paddle_y, 0.0),
-                scale: PADDLE_SIZE,
-                ..default()
-            },
-            sprite: Sprite {
-                color: PADDLE_COLOR,
-                ..default()
-            },
-            ..default()
-        },
-        Paddle,
-        Collider,
-    ));
 
     // Walls
     commands.spawn(WallBundle::new(WallLocation::Left));
