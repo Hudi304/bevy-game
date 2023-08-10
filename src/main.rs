@@ -4,8 +4,14 @@ use bevy::{
     prelude::*,
     render::{mesh::Indices, render_resource::PrimitiveTopology},
 };
+use hex::{
+    hex::get_hex_vertices,
+    poligon::{build_polygon_mesh, get_polygon_vert},
+};
 
 mod common;
+
+mod hex;
 
 use crate::common::{wall_bundle::WallBundle, wall_location::WallLocation};
 
@@ -28,73 +34,7 @@ fn main() {
         .run();
 }
 
-fn get_hex_vertexes(r: f32, offset: f32) -> Vec<[f32; 3]> {
-    let vertex_no = 6.;
-
-    let full_circle = 2. * PI;
-
-    let x = |i: f32| (r * ((i * full_circle / vertex_no + offset).cos()));
-    let y = |i: f32| (r * ((i * full_circle / vertex_no + offset).sin()));
-
-    let v0 = [x(0.), y(0.), 0.];
-    let v1 = [x(1.), y(1.), 0.];
-    let v2 = [x(2.), y(2.), 0.];
-    let v3 = [x(3.), y(3.), 0.];
-    let v4 = [x(4.), y(4.), 0.];
-    let v5 = [x(5.), y(5.), 0.];
-
-    return vec![v0, v1, v2, v3, v4, v5];
-}
-
-// TODO search fpr the wey bevy is storing positions
-fn poligon_mesh() -> Mesh {
-    let center = ([0., 0., 0.], [0., 0., 1.], [0., 0.]);
-
-    let x = |root: f32| (root * 2. * PI / 6.).cos();
-    let y = |root: f32| (root * 2. * PI / 6.).sin();
-
-    let spike0 = ([1., 0., 0.], [0., 0., 1.], [0., 0.]);
-    let spike1 = ([x(1.), y(1.), 0.], [0., 0., 1.], [0., 0.]);
-    let spike2 = ([x(2.), y(2.), 0.], [0., 0., 1.], [0., 0.]);
-    let spike3 = ([x(3.), y(3.), 0.], [0., 0., 1.], [0., 0.]);
-    let spike4 = ([x(4.), y(4.), 0.], [0., 0., 1.], [0., 0.]);
-    let spike5 = ([x(5.), y(5.), 0.], [0., 0., 1.], [0., 0.]);
-
-    let vertices = [center, spike0, spike1, spike2, spike3, spike4, spike5];
-
-    let mut positions = Vec::with_capacity(6);
-    let mut normals = Vec::with_capacity(6);
-    let mut uvs = Vec::with_capacity(6);
-
-    println!("");
-
-    for (position, normal, uv) in vertices.iter() {
-        positions.push(*position);
-        normals.push(*normal);
-        uvs.push(*uv);
-
-        print!("[{}, {}, {}]", position[0], position[1], position[2]);
-        println!("");
-    }
-
-    println!("");
-
-    let indices = Indices::U32(vec![0, 1, 2, 0, 2, 3, 0, 3, 4, 0, 4, 5, 0, 5, 6, 0, 6, 1]);
-
-    let mut mesh = Mesh::new(PrimitiveTopology::TriangleList);
-    mesh.insert_attribute(Mesh::ATTRIBUTE_POSITION, positions);
-    mesh.insert_attribute(Mesh::ATTRIBUTE_NORMAL, normals);
-    mesh.insert_attribute(Mesh::ATTRIBUTE_UV_0, uvs);
-    mesh.set_indices(Some(indices));
-
-    return mesh;
-}
-
-fn vec_to_vec3([x, y, z]: [f32; 3]) -> Vec3 {
-    return Vec3 { x, y, z };
-}
-
-fn system(mut gizmos: Gizmos, time: Res<Time>) {
+fn system(mut gizmos: Gizmos, _time: Res<Time>) {
     // let sin = time.elapsed_seconds().sin() * 50.;
 
     let r = 6.;
@@ -111,15 +51,27 @@ fn render_map(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
-    let center = [0., 0., 0.];
-    let mut pos_vec1 = get_hex_vertexes(1.75, PI / 6.);
+    // color
+    let red = Color::rgb_u8(255, 0, 0);
+    let material = materials.add(red.into());
 
-    pos_vec1.push(center);
+    // tile mesh
+    let hex_tile_vtx_pos = get_polygon_vert(6, 1.0, 0.);
+    let hex_tile_mesh = build_polygon_mesh(hex_tile_vtx_pos);
+    let mesh = meshes.add(hex_tile_mesh);
 
-    let material = materials.add(Color::rgb_u8(255, 0, 0).into());
-    let mesh = meshes.add(poligon_mesh());
+    // tile positions
 
-    for pos in pos_vec1.iter() {
+    // center and first circle
+    let mut tile_pos_vec1 = get_hex_vertices(1.8, PI / 6.);
+
+    // outer circle
+    let outer_circle = get_hex_vertices(3.1, 0.0);
+    let outer_circle: Vec<[f32; 3]> = outer_circle.iter().skip(1).cloned().collect();
+
+    tile_pos_vec1.extend(outer_circle);
+
+    for pos in tile_pos_vec1.iter() {
         let transform = Transform::from_translation(Vec3::from_slice(pos));
 
         commands.spawn(PbrBundle {
@@ -134,12 +86,12 @@ fn render_map(
 // Add the game's entities to our world
 fn setup(
     mut commands: Commands,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<StandardMaterial>>,
+    mut _meshes: ResMut<Assets<Mesh>>,
+    mut _materials: ResMut<Assets<StandardMaterial>>,
 ) {
     // Camera
     commands.spawn(Camera3dBundle {
-        transform: Transform::from_translation(Vec3::new(0., 0., 10.))
+        transform: Transform::from_translation(Vec3::new(0., 0., 15.))
             .looking_at(Vec3::ZERO, Vec3::Y),
         ..Default::default()
     });
