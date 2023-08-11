@@ -2,8 +2,10 @@ use std::f32::consts::PI;
 
 use bevy::prelude::*;
 
-use super::{poligon::{get_polygon_vert, build_polygon_mesh}, hex::get_hex_vertices};
-
+use super::{
+    hex::get_hex_vertices,
+    polygon::{build_polygon_mesh, get_polygon_vert},
+};
 
 pub fn render_map(
     mut commands: Commands,

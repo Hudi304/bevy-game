@@ -1,4 +1,4 @@
-use super::poligon::{get_polygon_vert, vec3_to_vec};
+use super::polygon::{get_polygon_vert, vec3_to_vec};
 
 pub struct Hex {
     center: [f32; 3],

@@ -1,4 +1,4 @@
 pub mod hex;
-pub mod poligon;
+pub mod polygon;
 pub mod map;
 pub mod gizmos_system;
