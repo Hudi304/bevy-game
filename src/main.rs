@@ -1,6 +1,8 @@
 use bevy::prelude::*;
 use bevy_tutorial::{
-    player::{spawn_camera, spawn_player},
+    camera::spawn_camera,
+    enamy::spawn_enamy,
+    player::spawn_player,
     player_movement::{confine_player_movement, player_movement},
 };
 use hex::{gizmos_system::gizmos_system, map::render_map};
@@ -32,6 +34,7 @@ fn main() {
         .add_plugins(DefaultPlugins)
         .add_systems(Startup, spawn_player)
         .add_systems(Startup, spawn_camera)
+        .add_systems(Startup, spawn_enamy)
         .add_systems(Update, player_movement)
         .add_systems(Update, confine_player_movement)
         .run();
