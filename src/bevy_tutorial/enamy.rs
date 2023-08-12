@@ -17,7 +17,7 @@ pub fn spawn_enamy(
 
     for _ in 0..ENAMY_NO {
         let en_x = random::<f32>() * window.width();
-        let en_y = random::<f32>() * window.width();
+        let en_y = random::<f32>() * window.height();
         let en_pos = Vec3::new(en_x, en_y, 0.0);
 
         let en_dir_x = random::<f32>();

@@ -5,7 +5,7 @@ use super::player::Player;
 pub const PLAYER_SPEED: f32 = 500.0;
 pub const PLAYER_SIZE: f32 = 64.0;
 
-pub fn player_movement(
+pub fn player_input(
     keyboard_input: Res<Input<KeyCode>>,
     mut player_query: Query<&mut Transform, With<Player>>,
     time: Res<Time>,
@@ -45,7 +45,6 @@ pub fn confine_player_movement(
 ) {
     if let Ok(mut player_transform) = player_query.get_single_mut() {
         let window = window_query.get_single().unwrap();
-
         let half_player_size = PLAYER_SIZE / 2.0;
 
         let x_min = 0.0 + half_player_size;
@@ -74,8 +73,6 @@ pub fn confine_player_movement(
             player_transaltion.y = y_max;
         }
 
-        // why is this needed didn't we get a mutable reference to the 
-        // player transform?  is it a copy?
         player_transform.translation = player_transaltion;
     }
 }
