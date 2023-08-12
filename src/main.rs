@@ -1,4 +1,4 @@
-use bevy::prelude::*;
+use bevy::{prelude::*, window::WindowResolution};
 use bevy_tutorial::{
     camera::spawn_camera,
     enamy::spawn_enamy,
@@ -31,7 +31,15 @@ fn _catan_clone() {
 
 fn main() {
     App::new()
-        .add_plugins(DefaultPlugins)
+        .add_plugins(DefaultPlugins.set(WindowPlugin {
+            primary_window: Some(Window {
+                window_level: bevy::window::WindowLevel::AlwaysOnTop,
+                resolution: WindowResolution::new(400.0, 400.0),
+                ..default()
+            }),
+            ..default()
+        }))
+        // .add_plugins(DefaultPlugins)
         .add_systems(Startup, spawn_player)
         .add_systems(Startup, spawn_camera)
         .add_systems(Startup, spawn_enamy)
