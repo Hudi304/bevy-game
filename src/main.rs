@@ -2,6 +2,7 @@ use bevy::{prelude::*, window::WindowResolution};
 use bevy_tutorial::{
     camera::spawn_camera,
     enamy::spawn_enamy,
+    enamy_movement::enamy_movement,
     player::spawn_player,
     player_movement::{confine_player_movement, player_movement},
 };
@@ -44,6 +45,7 @@ fn main() {
         .add_systems(Startup, spawn_camera)
         .add_systems(Startup, spawn_enamy)
         .add_systems(Update, player_movement)
+        .add_systems(Update, enamy_movement)
         .add_systems(Update, confine_player_movement)
         .run();
 

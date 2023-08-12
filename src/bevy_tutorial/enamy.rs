@@ -1,10 +1,12 @@
-use bevy::{prelude::*, transform::commands, window::PrimaryWindow};
+use bevy::{prelude::*, window::PrimaryWindow};
 use rand::random;
 
 pub const ENAMY_NO: usize = 6;
 
 #[derive(Component)]
-pub struct Enamy {}
+pub struct Enamy {
+    pub direction: Vec2,
+}
 
 pub fn spawn_enamy(
     mut commands: Commands,
@@ -16,8 +18,13 @@ pub fn spawn_enamy(
     for _ in 0..ENAMY_NO {
         let en_x = random::<f32>() * window.width();
         let en_y = random::<f32>() * window.width();
-
         let en_pos = Vec3::new(en_x, en_y, 0.0);
+
+        let en_dir_x = random::<f32>();
+        let en_dir_y = random::<f32>();
+
+        let en_dir: Vec2 = (en_dir_x, en_dir_y).into();
+        let en_dir = en_dir.normalize();
 
         commands.spawn((
             SpriteBundle {
@@ -25,7 +32,7 @@ pub fn spawn_enamy(
                 texture: asset_server.load("sprites/ball_red_large.png"),
                 ..default()
             },
-            Enamy {},
+            Enamy { direction: en_dir },
         ));
     }
 }
