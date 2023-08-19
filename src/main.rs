@@ -1,9 +1,10 @@
 use bevy::{prelude::*, window::WindowResolution};
 use bevy_tutorial::{
     camera::spawn_camera,
-    enamy::spawn_enamy,
-    enamy_movement::{confine_enamy_movement, enamy_movement, enamy_wall_collison},
+    enemy::spawn_enamy,
+    enemy_movement::{confine_enemy_movement, enemy_movement, enemy_wall_collision},
     player::spawn_player,
+    player_hit::player_hit,
     player_movement::{confine_player_movement, player_input},
 };
 use hex::{gizmos_system::gizmos_system, map::render_map};
@@ -45,10 +46,11 @@ fn main() {
         .add_systems(Startup, spawn_camera)
         .add_systems(Startup, spawn_enamy)
         .add_systems(Update, player_input)
-        .add_systems(Update, enamy_movement)
+        .add_systems(Update, enemy_movement)
         .add_systems(Update, confine_player_movement)
-        .add_systems(Update, confine_enamy_movement)
-        .add_systems(Update, enamy_wall_collison)
+        .add_systems(Update, confine_enemy_movement)
+        .add_systems(Update, enemy_wall_collision)
+        .add_systems(Update, player_hit)
         .run();
 
     return ();

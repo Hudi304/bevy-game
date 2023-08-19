@@ -53,26 +53,26 @@ pub fn confine_player_movement(
         let y_min = 0.0 + half_player_size;
         let y_max = window.height() - half_player_size;
 
-        let mut player_transaltion = player_transform.translation;
+        let mut player_translation = player_transform.translation;
 
         // Bound player x position
-        if player_transaltion.x < x_min {
-            player_transaltion.x = x_min;
+        if player_translation.x < x_min {
+            player_translation.x = x_min;
         }
 
-        if player_transaltion.x > x_max {
-            player_transaltion.x = x_max;
+        if player_translation.x > x_max {
+            player_translation.x = x_max;
         }
 
         // Bound player y position
-        if player_transaltion.y < y_min {
-            player_transaltion.y = y_min;
+        if player_translation.y < y_min {
+            player_translation.y = y_min;
         }
 
-        if player_transaltion.y > y_max {
-            player_transaltion.y = y_max;
+        if player_translation.y > y_max {
+            player_translation.y = y_max;
         }
 
-        player_transform.translation = player_transaltion;
+        player_transform.translation = player_translation;
     }
 }

@@ -4,7 +4,7 @@ use rand::random;
 pub const ENAMY_NO: usize = 6;
 
 #[derive(Component)]
-pub struct Enamy {
+pub struct Enemy {
     pub direction: Vec2,
 }
 
@@ -32,7 +32,7 @@ pub fn spawn_enamy(
                 texture: asset_server.load("sprites/ball_red_large.png"),
                 ..default()
             },
-            Enamy { direction: en_dir },
+            Enemy { direction: en_dir },
         ));
     }
 }
