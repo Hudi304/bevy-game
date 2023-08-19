@@ -1,7 +1,7 @@
 use bevy::{prelude::*, window::WindowResolution};
 use bevy_tutorial::{
     camera::spawn_camera,
-    enemy::spawn_enamy,
+    enemy::spawn_enemy,
     enemy_movement::{confine_enemy_movement, enemy_movement, enemy_wall_collision},
     player::spawn_player,
     player_hit::player_hit,
@@ -44,7 +44,7 @@ fn main() {
         // .add_plugins(DefaultPlugins)
         .add_systems(Startup, spawn_player)
         .add_systems(Startup, spawn_camera)
-        .add_systems(Startup, spawn_enamy)
+        .add_systems(Startup, spawn_enemy)
         .add_systems(Update, player_input)
         .add_systems(Update, enemy_movement)
         .add_systems(Update, confine_player_movement)
