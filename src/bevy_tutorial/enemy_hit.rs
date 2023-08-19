@@ -4,7 +4,7 @@ use super::{
     enemy::Enemy, enemy_movement::ENEMY_SIZE, player::Player, player_movement::PLAYER_SIZE,
 };
 
-pub fn player_hit(
+pub fn enemy_hit(
     mut commands: Commands,
     player_query: Query<(Entity, &Transform), With<Player>>, // this does not have to be mutable to despawn the entity
     enemy_query: Query<&Transform, With<Enemy>>,

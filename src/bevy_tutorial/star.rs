@@ -2,6 +2,7 @@ use bevy::{prelude::*, window::PrimaryWindow};
 use rand::random;
 
 pub const NUMBER_OF_STARS: i32 = 10;
+pub const STAR_SIZE: f32 = 30.0;
 
 #[derive(Component)]
 pub struct Star {}
