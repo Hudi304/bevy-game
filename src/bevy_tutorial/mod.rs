@@ -4,3 +4,4 @@ pub mod enemy_movement;
 pub mod player;
 pub mod player_hit;
 pub mod player_movement;
+pub mod star;

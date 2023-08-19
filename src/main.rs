@@ -6,6 +6,7 @@ use bevy_tutorial::{
     player::spawn_player,
     player_hit::player_hit,
     player_movement::{confine_player_movement, player_input},
+    star::spawn_star,
 };
 use hex::{gizmos_system::gizmos_system, map::render_map};
 
@@ -45,6 +46,7 @@ fn main() {
         .add_systems(Startup, spawn_player)
         .add_systems(Startup, spawn_camera)
         .add_systems(Startup, spawn_enemy)
+        .add_systems(Startup, spawn_star)
         .add_systems(Update, player_input)
         .add_systems(Update, enemy_movement)
         .add_systems(Update, confine_player_movement)
