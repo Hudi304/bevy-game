@@ -49,7 +49,6 @@ fn main() {
         .add_systems(Update, confine_player_movement)
         .add_systems(Update, confine_enamy_movement)
         .add_systems(Update, enamy_wall_collison)
-
         .run();
 
     return ();

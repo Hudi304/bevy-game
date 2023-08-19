@@ -40,12 +40,20 @@ pub fn enamy_wall_collison(
         let en_trnsl = en_tranform.translation;
 
         // Bound enamy x position
-        if en_trnsl.x < x_min || en_trnsl.x > x_max {
+        if en_trnsl.x <= x_min {
+            enamy.direction.x *= -1.0;
+        }
+
+        if en_trnsl.x >= x_max {
             enamy.direction.x *= -1.0;
         }
 
         // Bound enamy y position
-        if en_trnsl.y < y_min || en_trnsl.y > y_max {
+        if en_trnsl.y <=  y_min {
+            enamy.direction.y *= -1.0;
+        }
+
+        if en_trnsl.y >= y_max {
             enamy.direction.y *= -1.0;
         }
     }
