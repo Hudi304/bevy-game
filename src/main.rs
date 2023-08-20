@@ -45,36 +45,59 @@ fn main() {
             ..default()
         }))
         // .add_plugins(DefaultPlugins)
+        // custom resources
         .init_resource::<Score>()
         .init_resource::<StarSpawnTimer>()
         .init_resource::<SpawnEnemyTimer>()
-        .add_systems(Startup, spawn_player)
+        // custom events
+        .add_event::<GameOverEvent>()
+        // camera
         .add_systems(Startup, spawn_camera)
-        .add_systems(Startup, spawn_enemy)
+        // spawn entities
+        .add_systems(Startup, spawn_player)
+        // .add_systems(Startup, spawn_enemy)
         .add_systems(Startup, spawn_star)
+        // player
         .add_systems(Update, player_input)
-        .add_systems(Update, enemy_movement)
         .add_systems(Update, confine_player_movement)
-        .add_systems(Update, confine_enemy_movement)
-        .add_systems(Update, enemy_wall_collision)
         .add_systems(Update, player_hit_enemy)
         .add_systems(Update, player_hit_star)
-        .add_systems(Update, update_score)
-        .add_systems(Update, tick_star_spawn_timer)
-        .add_systems(Update, spawn_stars_over_time)
+        // enemy
+        .add_systems(Update, enemy_movement)
+        .add_systems(Update, confine_enemy_movement)
+        .add_systems(Update, enemy_wall_collision)
         .add_systems(Update, tick_spawn_enemies_timer)
         .add_systems(Update, spawn_enemies_over_time)
+        // star
+        .add_systems(Update, spawn_stars_over_time)
+        .add_systems(Update, update_score)
+        .add_systems(Update, tick_star_spawn_timer)
+        .add_systems(Update, handle_game_over_event)
         .add_systems(Update, exit_game)
         .run();
 
     return ();
 }
 
+#[derive(Event)]
+pub struct GameOverEvent {
+    final_score: u32,
+}
+
+// this fires on startup for some reason
 pub fn exit_game(
     keyboard_input: Res<Input<KeyCode>>,
     mut app_exit_event_writer: EventWriter<AppExit>,
 ) {
     if keyboard_input.just_pressed(KeyCode::Escape) {
+        println!("App exit");
         app_exit_event_writer.send(AppExit);
+    }
+}
+
+pub fn handle_game_over_event(mut game_over_event_reader: EventReader<GameOverEvent>) {
+    // multiple systems can send the same event in the same frame
+    for go_event in game_over_event_reader.iter() {
+        println!("Your final score is  : {}", go_event.final_score)
     }
 }

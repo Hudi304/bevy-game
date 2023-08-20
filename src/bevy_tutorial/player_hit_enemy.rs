@@ -1,13 +1,18 @@
 use bevy::prelude::*;
 
+use crate::GameOverEvent;
+
 use super::{
     enemy::Enemy, enemy_movement::ENEMY_SIZE, player::Player, player_movement::PLAYER_SIZE,
+    score::Score,
 };
 
 pub fn player_hit_enemy(
     mut commands: Commands,
     player_query: Query<(Entity, &Transform), With<Player>>, // this does not have to be mutable to despawn the entity
     enemy_query: Query<&Transform, With<Enemy>>,
+    mut game_over_event_writer: EventWriter<GameOverEvent>,
+    score: Res<Score>,
 ) {
     let pl_query_result = player_query.get_single();
 
@@ -37,6 +42,11 @@ pub fn player_hit_enemy(
         if pl_en_distance <= min_dist {
             println!("HIT");
             commands.entity(pl_ent).despawn();
+
+            let final_score = score.as_ref().value;
+            game_over_event_writer.send(GameOverEvent { final_score });
         }
     }
+
+    return ();
 }
