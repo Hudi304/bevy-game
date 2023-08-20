@@ -4,10 +4,11 @@ use bevy_tutorial::{
     enemy::spawn_enemy,
     enemy_movement::{confine_enemy_movement, enemy_movement, enemy_wall_collision},
     player::spawn_player,
-    enemy_hit::enemy_hit,
+    player_hit_enemy::player_hit_enemy,
+    player_hit_star::player_hit_star,
     player_movement::{confine_player_movement, player_input},
+    score::Score,
     star::spawn_star,
-    star_hit::star_hit,
 };
 use hex::{gizmos_system::gizmos_system, map::render_map};
 
@@ -44,6 +45,7 @@ fn main() {
             ..default()
         }))
         // .add_plugins(DefaultPlugins)
+        .init_resource::<Score>()
         .add_systems(Startup, spawn_player)
         .add_systems(Startup, spawn_camera)
         .add_systems(Startup, spawn_enemy)
@@ -53,8 +55,8 @@ fn main() {
         .add_systems(Update, confine_player_movement)
         .add_systems(Update, confine_enemy_movement)
         .add_systems(Update, enemy_wall_collision)
-        .add_systems(Update, enemy_hit)
-        .add_systems(Update, star_hit)
+        .add_systems(Update, player_hit_enemy)
+        .add_systems(Update, player_hit_star)
         .run();
 
     return ();

@@ -3,13 +3,15 @@ use bevy::prelude::*;
 use super::{
     player::Player,
     player_movement::PLAYER_SIZE,
+    score::Score,
     star::{Star, STAR_SIZE},
 };
 
-pub fn star_hit(
+pub fn player_hit_star(
     mut commands: Commands,
     player_query: Query<&Transform, With<Player>>,
     star_query: Query<(Entity, &Transform), With<Star>>,
+    mut score_res: ResMut<Score>,
 ) {
     let pl_res = player_query.get_single();
 
@@ -24,6 +26,11 @@ pub fn star_hit(
 
             if dist <= min_dist {
                 commands.entity(star_ent).despawn();
+
+                let score = score_res.as_mut();
+                score.value += 1;
+                let score_val = score.value;
+                println!("Score : {score_val}");
             }
         }
     }
