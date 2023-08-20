@@ -63,146 +63,49 @@ impl HexWorldTile {
     }
 }
 
-pub fn spawn_center_tile(
+pub fn hex(
+    center: Vec3,
+    material: &Handle<StandardMaterial>,
+    mesh: &Handle<Mesh>,
+) -> (PbrBundle, HexWorldTile) {
+    return HexWorldTile::build(center, material.clone(), mesh.clone());
+}
+
+pub fn test_tile(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
-    let center = Vec3::ZERO;
     let material: Handle<StandardMaterial> = materials.add(Color::GREEN.into());
+    let h = 3_f32.sqrt() / 2.;
 
-    let center_tile_mesh = HexWorldTile::build_hex_mesh(0.0);
-    let mesh = meshes.add(center_tile_mesh);
-    let center_tile = HexWorldTile::build(center, material, mesh);
-    commands.spawn(center_tile);
-}
+    // TODO try to offset it by PI / 6
+    // let u = |c: Vec3| (c.x + c.y / 2. - c.z / 2.0) * 2.;
+    // let v = |c: Vec3| ((c.y + c.z) * 3_f32.sqrt() / 2.) * 2.;
+    // let uv = |c: Vec3| Vec3::new(u(c), v(c), 0.0);
 
-pub fn spawn_fist_tile_row(
-    mut commands: Commands,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<StandardMaterial>>,
-) {
-    let tile_dist = 3_f32.sqrt() * TILE_RADIUS;
-    let hex_tile_vertex_vec = get_hex_vertices(tile_dist, PI / 6.);
+    let x = |v: Vec3| (v.x + v.y / 2.) * 2. * h;
+    let y = |v: Vec3| (v.y * 3_f32.sqrt() / 2.) * 2. * h;
 
-    let mut red: u8 = 0;
+    let xy = |v: Vec3| Vec3::new(1.01 * x(v), 1.01 * y(v), 0.0);
 
-    let adjacent_hexes: Vec<(PbrBundle, HexWorldTile)> = hex_tile_vertex_vec
-        .iter()
-        .map(|center_position| {
-            let color = Color::rgb_u8(red, 10, 10);
-            let material_handle = materials.add(color.into());
-            red += 40;
-            let mesh_handle = meshes.add(HexWorldTile::build_hex_mesh(0.0));
-            return HexWorldTile::build(center_position.clone(), material_handle, mesh_handle);
-        })
-        .collect();
+    let mut hex_arr = vec![];
 
-    for tile in adjacent_hexes {
-        commands.spawn(tile);
-    }
-}
+    for q in -3..4 {
+        for r in -3..4 {
+            let s: i32 = q + r;
+            if s.abs() > 3 {
+                continue;
+            }
 
-pub fn spawn_second_tile_row(
-    mut commands: Commands,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<StandardMaterial>>,
-) {
-    let hex_tile_vertex_vec = get_hex_vertices(TILE_RADIUS * 3., 0.0);
-    let mut green: u8 = 255;
-    let adjacent_hexes: Vec<(PbrBundle, HexWorldTile)> = hex_tile_vertex_vec
-        .iter()
-        .map(|center_position| {
-            let color = Color::rgb_u8(10, green, 10);
-            let material_handle = materials.add(color.into());
-            green -= 30;
-            let mesh_handle = meshes.add(HexWorldTile::build_hex_mesh(0.0));
-            return HexWorldTile::build(center_position.clone(), material_handle, mesh_handle);
-        })
-        .collect();
-
-    for tile in adjacent_hexes {
-        commands.spawn(tile);
+            let cub_pos = Vec3::new(q as f32, r as f32, s as f32);
+            hex_arr.push(xy(cub_pos));
+        }
     }
 
-    let hex_h = 3_f32.sqrt() * TILE_RADIUS / 2.;
-
-    let radius = 4. * hex_h;
-    let hex_tile_vertex_vec = get_hex_vertices(radius, PI / 6.);
-    let mut green: u8 = 255;
-    let adjacent_hexes: Vec<(PbrBundle, HexWorldTile)> = hex_tile_vertex_vec
-        .iter()
-        .map(|center_position| {
-            let color = Color::rgb_u8(10, green, 10);
-            let material_handle = materials.add(color.into());
-            green -= 30;
-            let mesh_handle = meshes.add(HexWorldTile::build_hex_mesh(0.0));
-            return HexWorldTile::build(center_position.clone(), material_handle, mesh_handle);
-        })
-        .collect();
-
-    for tile in adjacent_hexes {
-        commands.spawn(tile);
-    }
-}
-
-pub fn spawn_water_tile_row(
-    mut commands: Commands,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<StandardMaterial>>,
-) {
-    let hex_h = 3_f32.sqrt() * TILE_RADIUS / 2.;
-
-    let hex_tile_vertex_vec = get_hex_vertices(hex_h * 6., PI / 6.);
-    let mut blue: u8 = 255;
-    let adjacent_hexes: Vec<(PbrBundle, HexWorldTile)> = hex_tile_vertex_vec
-        .iter()
-        .map(|center_position| {
-            let color = Color::rgb_u8(10, 10, blue);
-            let material_handle = materials.add(color.into());
-            blue -= 30;
-            let mesh_handle = meshes.add(HexWorldTile::build_hex_mesh(0.0)); // pi/24 * 0
-            return HexWorldTile::build(center_position.clone(), material_handle, mesh_handle);
-        })
-        .collect();
-
-    for tile in adjacent_hexes {
-        commands.spawn(tile);
-    }
-
-    let dist = 4.62; // (pos.x.powi(2) + pos.y.powi(2)).sqrt();
-
-    let hex_tile_vertex_vec = get_hex_vertices(dist, PI / 18.); // (PI/24 *1)
-    let mut blue: u8 = 255;
-    let adjacent_hexes: Vec<(PbrBundle, HexWorldTile)> = hex_tile_vertex_vec
-        .iter()
-        .map(|center_position| {
-            let color = Color::rgb_u8(10, 10, blue);
-            let material_handle = materials.add(color.into());
-            blue -= 30;
-            let mesh_handle = meshes.add(HexWorldTile::build_hex_mesh(0.0)); // PI/(24*2)
-            return HexWorldTile::build(center_position.clone(), material_handle, mesh_handle);
-        })
-        .collect();
-
-    for tile in adjacent_hexes {
-        commands.spawn(tile);
-    }
-
-    let hex_tile_vertex_vec = get_hex_vertices(dist, -PI / 18.);
-    let mut blue: u8 = 255;
-    let adjacent_hexes: Vec<(PbrBundle, HexWorldTile)> = hex_tile_vertex_vec
-        .iter()
-        .map(|center_position| {
-            let color = Color::rgb_u8(10, 10, blue);
-            let material_handle = materials.add(color.into());
-            blue -= 30;
-            let mesh_handle = meshes.add(HexWorldTile::build_hex_mesh(0.0));
-            return HexWorldTile::build(center_position.clone(), material_handle, mesh_handle);
-        })
-        .collect();
-
-    for tile in adjacent_hexes {
-        commands.spawn(tile);
+    for pos in hex_arr {
+        let center_tile_mesh = HexWorldTile::build_hex_mesh(PI / 6.);
+        let mesh = meshes.add(center_tile_mesh);
+        commands.spawn(hex(pos, &material, &mesh));
     }
 }

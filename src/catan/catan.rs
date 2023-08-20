@@ -1,11 +1,6 @@
 use bevy::{prelude::*, window::WindowResolution};
 
-use super::{
-    camera::spawn_3d_camera,
-    map_tile::{
-        spawn_center_tile, spawn_fist_tile_row, spawn_second_tile_row, spawn_water_tile_row,
-    },
-};
+use super::{camera::spawn_3d_camera, map_tile::test_tile};
 
 pub struct Catan;
 
@@ -43,10 +38,11 @@ impl Plugin for Catan {
         //  v = (y + z)sqrt(3)/2
         .add_systems(Startup, spawn_3d_camera)
         // .add_systems(Startup, render_map)
-        .add_systems(Startup, spawn_center_tile)
-        .add_systems(Startup, spawn_fist_tile_row)
-        .add_systems(Startup, spawn_second_tile_row)
-        .add_systems(Startup, spawn_water_tile_row);
+        .add_systems(Startup, test_tile);
+        // .add_systems(Startup, spawn_center_tile)
+        // .add_systems(Startup, spawn_fist_tile_row)
+        // .add_systems(Startup, spawn_second_tile_row)
+        // .add_systems(Startup, spawn_water_tile_row);
 
         // .add_systems(Update, bevy::window::close_on_esc);
     }
