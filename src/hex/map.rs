@@ -3,8 +3,8 @@ use std::f32::consts::PI;
 use bevy::prelude::*;
 
 use super::{
-    hex::get_hex_vertices,
-    polygon::{build_polygon_mesh, get_polygon_vert},
+    hex::get_hex_vertices_with_center,
+    polygon::{build_polygon_mesh, get_polygon_vert_with_center},
 };
 
 pub fn render_map(
@@ -17,17 +17,17 @@ pub fn render_map(
     let material = materials.add(red.into());
 
     // tile mesh
-    let hex_tile_vtx_pos = get_polygon_vert(6, 1.0, 0.);
-    let hex_tile_mesh = build_polygon_mesh(hex_tile_vtx_pos);
+    let hex_tile_vtx_pos = get_polygon_vert_with_center(6, 1.0, 0.);
+    let hex_tile_mesh = build_polygon_mesh(&hex_tile_vtx_pos);
     let mesh = meshes.add(hex_tile_mesh);
 
     // tile positions
 
     // center and first circle
-    let mut tile_pos_vec1 = get_hex_vertices(1.8, PI / 6.);
+    let mut tile_pos_vec1 = get_hex_vertices_with_center(1.8, PI / 6.);
 
     // outer circle
-    let outer_circle = get_hex_vertices(3.1, 0.0);
+    let outer_circle = get_hex_vertices_with_center(3.1, 0.0);
     let outer_circle: Vec<[f32; 3]> = outer_circle.iter().skip(1).cloned().collect();
 
     tile_pos_vec1.extend(outer_circle);

@@ -11,6 +11,6 @@ mod catan;
 
 fn main() {
     // BALL GAME
-    App::new().add_plugins(BallGame).run();
+    // App::new().add_plugins(BallGame).run();
     App::new().add_plugins(Catan).run();
 }

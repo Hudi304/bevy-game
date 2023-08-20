@@ -5,11 +5,9 @@ use bevy::{
     render::{mesh::Indices, render_resource::PrimitiveTopology},
 };
 
-/*
-Returns the vertices of a polygon as a Vec<Vec3>
-where the first one is the center
-*/
-pub fn get_polygon_vert(vert_no: usize, radius: f32, offset_angle: f32) -> Vec<Vec3> {
+/// Returns the vertices of a polygon as a Vec<Vec3>. \
+/// The first element is the center.
+pub fn get_polygon_vert_with_center(vert_no: usize, radius: f32, offset_angle: f32) -> Vec<Vec3> {
     let center: Vec3 = Vec3::ZERO;
 
     let mut vertex_vector = Vec::with_capacity(vert_no);
@@ -41,15 +39,39 @@ pub fn get_polygon_vert(vert_no: usize, radius: f32, offset_angle: f32) -> Vec<V
     return vertex_vector;
 }
 
-// pub fn vec_to_vec3([x, y, z]: [f32; 3]) -> Vec3 {
-//     return Vec3 { x, y, z };
-// }
+/// Returns the vertices of a polygon as a Vec<Vec3>. \
+/// The first element is the center.
+pub fn get_hex_vertices(radius: f32, offset_angle: f32) -> Vec<Vec3> {
+    let mut vertex_vector = Vec::with_capacity(6);
+    let vert_no_f32 = 6.0;
+
+    let vertex_to_ox_angle = 2. * PI / vert_no_f32;
+
+    let x = |root: f32| radius * ((root * vertex_to_ox_angle + offset_angle).cos());
+    let y = |root: f32| radius * ((root * vertex_to_ox_angle + offset_angle).sin());
+
+    for i in 0..6 {
+        // conversion
+        let vert_x = x(i as f32);
+        let vert_y = y(i as f32);
+
+        let vert = Vec3::new(vert_x, vert_y, 0.);
+
+        vertex_vector.push(vert);
+    }
+
+    return vertex_vector;
+}
+
+pub fn vec_to_vec3([x, y, z]: [f32; 3]) -> Vec3 {
+    return Vec3 { x, y, z };
+}
 
 pub fn vec3_to_vec(vec: &Vec3) -> [f32; 3] {
     return [vec[0], vec[1], vec[2]];
 }
 
-pub fn build_polygon_mesh(vertex_vector: Vec<Vec3>) -> Mesh {
+pub fn build_polygon_mesh(vertex_vector: &Vec<Vec3>) -> Mesh {
     let mut positions = Vec::with_capacity(6);
     let mut normals = Vec::with_capacity(6);
     let mut uvs = Vec::with_capacity(6);
