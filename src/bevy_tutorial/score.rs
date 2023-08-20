@@ -10,3 +10,10 @@ impl Default for Score {
         Score { value: 0 }
     }
 }
+
+pub fn update_score(score: Res<Score>) {
+    if score.is_changed() {
+        let score_val = score.value;
+        println!("Score : {score_val}");
+    }
+}

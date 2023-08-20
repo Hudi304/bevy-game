@@ -29,8 +29,6 @@ pub fn player_hit_star(
 
                 let score = score_res.as_mut();
                 score.value += 1;
-                let score_val = score.value;
-                println!("Score : {score_val}");
             }
         }
     }

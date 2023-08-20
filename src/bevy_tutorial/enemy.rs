@@ -1,7 +1,7 @@
 use bevy::{prelude::*, window::PrimaryWindow};
 use rand::random;
 
-pub const ENEMY_NO: usize = 6;
+pub const ENEMY_NO: usize = 2;
 
 #[derive(Component)]
 pub struct Enemy {

@@ -7,7 +7,7 @@ use bevy_tutorial::{
     player_hit_enemy::player_hit_enemy,
     player_hit_star::player_hit_star,
     player_movement::{confine_player_movement, player_input},
-    score::Score,
+    score::{update_score, Score},
     star::spawn_star,
 };
 use hex::{gizmos_system::gizmos_system, map::render_map};
@@ -57,6 +57,7 @@ fn main() {
         .add_systems(Update, enemy_wall_collision)
         .add_systems(Update, player_hit_enemy)
         .add_systems(Update, player_hit_star)
+        .add_systems(Update, update_score)
         .run();
 
     return ();
