@@ -1,14 +1,14 @@
 use bevy::{prelude::*, window::WindowResolution};
 use bevy_tutorial::{
     camera::spawn_camera,
-    enemy::spawn_enemy,
+    enemy::{spawn_enemies_over_time, spawn_enemy, tick_spawn_enemies_timer, SpawnEnemyTimer},
     enemy_movement::{confine_enemy_movement, enemy_movement, enemy_wall_collision},
     player::spawn_player,
     player_hit_enemy::player_hit_enemy,
     player_hit_star::player_hit_star,
     player_movement::{confine_player_movement, player_input},
-    score::{update_score, Score, StarSpawnTimer},
-    star::{spawn_star, spawn_stars_over_time, tick_star_spawn_timer},
+    score::{update_score, Score},
+    star::{spawn_star, spawn_stars_over_time, tick_star_spawn_timer, StarSpawnTimer},
 };
 use hex::{gizmos_system::gizmos_system, map::render_map};
 
@@ -47,6 +47,7 @@ fn main() {
         // .add_plugins(DefaultPlugins)
         .init_resource::<Score>()
         .init_resource::<StarSpawnTimer>()
+        .init_resource::<SpawnEnemyTimer>()
         .add_systems(Startup, spawn_player)
         .add_systems(Startup, spawn_camera)
         .add_systems(Startup, spawn_enemy)
@@ -61,6 +62,8 @@ fn main() {
         .add_systems(Update, update_score)
         .add_systems(Update, tick_star_spawn_timer)
         .add_systems(Update, spawn_stars_over_time)
+        .add_systems(Update, tick_spawn_enemies_timer)
+        .add_systems(Update, spawn_enemies_over_time)
         .run();
 
     return ();

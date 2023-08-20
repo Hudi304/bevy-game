@@ -1,10 +1,22 @@
 use bevy::{prelude::*, window::PrimaryWindow};
 use rand::random;
 
-use super::score::StarSpawnTimer;
-
 pub const NUMBER_OF_STARS: i32 = 10;
 pub const STAR_SIZE: f32 = 30.0;
+pub const STAR_SPAWN_DT_S: f32 = 1.0; // 1 sec
+
+#[derive(Resource)]
+pub struct StarSpawnTimer {
+    pub timer: Timer,
+}
+
+impl Default for StarSpawnTimer {
+    fn default() -> StarSpawnTimer {
+        StarSpawnTimer {
+            timer: Timer::from_seconds(STAR_SPAWN_DT_S, TimerMode::Repeating),
+        }
+    }
+}
 
 #[derive(Component)]
 pub struct Star {}
