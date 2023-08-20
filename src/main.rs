@@ -7,8 +7,8 @@ use bevy_tutorial::{
     player_hit_enemy::player_hit_enemy,
     player_hit_star::player_hit_star,
     player_movement::{confine_player_movement, player_input},
-    score::{update_score, Score},
-    star::spawn_star,
+    score::{update_score, Score, StarSpawnTimer},
+    star::{spawn_star, spawn_stars_over_time, tick_star_spawn_timer},
 };
 use hex::{gizmos_system::gizmos_system, map::render_map};
 
@@ -46,6 +46,7 @@ fn main() {
         }))
         // .add_plugins(DefaultPlugins)
         .init_resource::<Score>()
+        .init_resource::<StarSpawnTimer>()
         .add_systems(Startup, spawn_player)
         .add_systems(Startup, spawn_camera)
         .add_systems(Startup, spawn_enemy)
@@ -58,6 +59,8 @@ fn main() {
         .add_systems(Update, player_hit_enemy)
         .add_systems(Update, player_hit_star)
         .add_systems(Update, update_score)
+        .add_systems(Update, tick_star_spawn_timer)
+        .add_systems(Update, spawn_stars_over_time)
         .run();
 
     return ();
