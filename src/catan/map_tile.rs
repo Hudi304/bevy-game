@@ -2,12 +2,18 @@ use std::f32::consts::PI;
 
 use bevy::prelude::*;
 
-use crate::hex::{
-    hex::get_hex_vertices_with_center,
-    polygon::{build_polygon_mesh, get_hex_vertices, get_polygon_vert_with_center},
-};
+use crate::hex::polygon::{build_polygon_mesh, get_hex_vertices, get_polygon_vert_with_center};
 
 pub const TILE_RADIUS: f32 = 1.0;
+
+pub enum TileType {
+    WHEAT,
+    STONE,
+    SHEEP,
+    CLAY,
+    WOOD,
+    DESERT,
+}
 
 #[derive(Component)]
 pub struct HexWorldTile {
@@ -16,12 +22,12 @@ pub struct HexWorldTile {
     // adjacent_tiles: [Box<HexWorldTile>; 6],
     // edges / roads -> 6
     // towns -> 6
+    // richness -> u8
     pub r: f32,
 }
 
-// pub fn spawn_first_hex_ring() {}
-
 impl HexWorldTile {
+    /// Builds a PrbBundle from a hex center and translates it.
     pub fn build(
         center: Vec3,
         material: Handle<StandardMaterial>,
@@ -51,12 +57,7 @@ impl HexWorldTile {
     }
     /// returns 6 elements
     pub fn get_adjacent_pos(&self, offset_angle_radians: f32) -> Vec<Vec3> {
-        // let position_offset = TILE_RADIUS / 10.0;
-        // a little space between the hexes
-        // let adjacent_hex_circle_radius = TILE_RADIUS * 2.0; //+ position_offset;
-
         let tile_dist = 3_f32.sqrt() * TILE_RADIUS;
-
         let hex_tile_vertex_vec = get_hex_vertices(tile_dist, offset_angle_radians);
         return hex_tile_vertex_vec;
     }
@@ -126,7 +127,7 @@ pub fn spawn_second_tile_row(
 
     let hex_h = 3_f32.sqrt() * TILE_RADIUS / 2.;
 
-    let radius = 4. * hex_h ;
+    let radius = 4. * hex_h;
     let hex_tile_vertex_vec = get_hex_vertices(radius, PI / 6.);
     let mut green: u8 = 255;
     let adjacent_hexes: Vec<(PbrBundle, HexWorldTile)> = hex_tile_vertex_vec
@@ -135,6 +136,67 @@ pub fn spawn_second_tile_row(
             let color = Color::rgb_u8(10, green, 10);
             let material_handle = materials.add(color.into());
             green -= 30;
+            let mesh_handle = meshes.add(HexWorldTile::build_hex_mesh(0.0));
+            return HexWorldTile::build(center_position.clone(), material_handle, mesh_handle);
+        })
+        .collect();
+
+    for tile in adjacent_hexes {
+        commands.spawn(tile);
+    }
+}
+
+pub fn spawn_water_tile_row(
+    mut commands: Commands,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<StandardMaterial>>,
+) {
+    let hex_h = 3_f32.sqrt() * TILE_RADIUS / 2.;
+
+    let hex_tile_vertex_vec = get_hex_vertices(hex_h * 6., PI / 6.);
+    let mut blue: u8 = 255;
+    let adjacent_hexes: Vec<(PbrBundle, HexWorldTile)> = hex_tile_vertex_vec
+        .iter()
+        .map(|center_position| {
+            let color = Color::rgb_u8(10, 10, blue);
+            let material_handle = materials.add(color.into());
+            blue -= 30;
+            let mesh_handle = meshes.add(HexWorldTile::build_hex_mesh(0.0)); // pi/24 * 0
+            return HexWorldTile::build(center_position.clone(), material_handle, mesh_handle);
+        })
+        .collect();
+
+    for tile in adjacent_hexes {
+        commands.spawn(tile);
+    }
+
+    let dist = 4.62; // (pos.x.powi(2) + pos.y.powi(2)).sqrt();
+
+    let hex_tile_vertex_vec = get_hex_vertices(dist, PI / 18.); // (PI/24 *1)
+    let mut blue: u8 = 255;
+    let adjacent_hexes: Vec<(PbrBundle, HexWorldTile)> = hex_tile_vertex_vec
+        .iter()
+        .map(|center_position| {
+            let color = Color::rgb_u8(10, 10, blue);
+            let material_handle = materials.add(color.into());
+            blue -= 30;
+            let mesh_handle = meshes.add(HexWorldTile::build_hex_mesh(0.0)); // PI/(24*2)
+            return HexWorldTile::build(center_position.clone(), material_handle, mesh_handle);
+        })
+        .collect();
+
+    for tile in adjacent_hexes {
+        commands.spawn(tile);
+    }
+
+    let hex_tile_vertex_vec = get_hex_vertices(dist, -PI / 18.);
+    let mut blue: u8 = 255;
+    let adjacent_hexes: Vec<(PbrBundle, HexWorldTile)> = hex_tile_vertex_vec
+        .iter()
+        .map(|center_position| {
+            let color = Color::rgb_u8(10, 10, blue);
+            let material_handle = materials.add(color.into());
+            blue -= 30;
             let mesh_handle = meshes.add(HexWorldTile::build_hex_mesh(0.0));
             return HexWorldTile::build(center_position.clone(), material_handle, mesh_handle);
         })

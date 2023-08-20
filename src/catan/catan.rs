@@ -1,16 +1,10 @@
-use bevy::{
-    prelude::*,
-    window::{PrimaryWindow, WindowResolution},
-};
-
-use crate::{
-    hex::polygon::{build_polygon_mesh, get_polygon_vert_with_center},
-    setup::setup_camera_and_walls,
-};
+use bevy::{prelude::*, window::WindowResolution};
 
 use super::{
     camera::spawn_3d_camera,
-    map_tile::{spawn_center_tile, spawn_fist_tile_row, spawn_second_tile_row},
+    map_tile::{
+        spawn_center_tile, spawn_fist_tile_row, spawn_second_tile_row, spawn_water_tile_row,
+    },
 };
 
 pub struct Catan;
@@ -43,11 +37,16 @@ impl Plugin for Catan {
         }))
         .insert_resource(ClearColor(BACKGROUND_COLOR))
         .insert_resource(FixedTime::new_from_secs(1.0 / 60.0))
+        // todo try to refactor this into cube coordinates
+        //  let x,y,z  be the cube coordinates  and u,v the cartesian coordinates, then
+        //  u = x + y/2 + z/2 (maybe just y/2 + z/2)
+        //  v = (y + z)sqrt(3)/2
         .add_systems(Startup, spawn_3d_camera)
         // .add_systems(Startup, render_map)
         .add_systems(Startup, spawn_center_tile)
         .add_systems(Startup, spawn_fist_tile_row)
-        .add_systems(Startup, spawn_second_tile_row);
+        .add_systems(Startup, spawn_second_tile_row)
+        .add_systems(Startup, spawn_water_tile_row);
 
         // .add_systems(Update, bevy::window::close_on_esc);
     }
