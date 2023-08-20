@@ -52,41 +52,16 @@ fn main() {
             }),
             ..default()
         }))
-        // .add_plugins(DefaultPlugins)
-        // custom resources
         .init_resource::<Score>()
-        // .init_resource::<StarSpawnTimer>()
-        // .init_resource::<SpawnEnemyTimer>()
-        // custom events
         .add_event::<GameOverEvent>()
-        // camera
         .add_systems(Startup, spawn_camera)
-
-
         .add_plugins(PlayerPlugin)
         .add_plugins(EnemyPlugin)
         .add_plugins(StarPlugin)
-        // spawn entities
-        // .add_systems(Startup, spawn_player)
-        // .add_systems(Startup, spawn_enemy)
-        // .add_systems(Startup, spawn_star)
-        // player
-        // .add_systems(Update, player_input)
-        // .add_systems(Update, confine_player_movement)
-        // .add_systems(Update, player_hit_enemy)
-        // .add_systems(Update, player_hit_star)
-        // enemy
-        // .add_systems(Update, enemy_movement)
-        // .add_systems(Update, confine_enemy_movement)
-        // .add_systems(Update, enemy_wall_collision)
-        // .add_systems(Update, tick_spawn_enemies_timer)
-        // .add_systems(Update, spawn_enemies_over_time)
-        // star
-        // .add_systems(Update, spawn_stars_over_time)
-        .add_systems(Update, update_score)
-        // .add_systems(Update, tick_star_spawn_timer)
-        .add_systems(Update, handle_game_over_event)
-        .add_systems(Update, exit_game)
+        .add_systems(
+            Update,
+            (update_score, handle_game_over_event, exit_game).chain(),
+        )
         .run();
 
     return ();
