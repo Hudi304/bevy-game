@@ -1,4 +1,4 @@
-use bevy::{prelude::*, window::WindowResolution};
+use bevy::{app::AppExit, prelude::*, window::WindowResolution};
 use bevy_tutorial::{
     camera::spawn_camera,
     enemy::{spawn_enemies_over_time, spawn_enemy, tick_spawn_enemies_timer, SpawnEnemyTimer},
@@ -64,7 +64,17 @@ fn main() {
         .add_systems(Update, spawn_stars_over_time)
         .add_systems(Update, tick_spawn_enemies_timer)
         .add_systems(Update, spawn_enemies_over_time)
+        .add_systems(Update, exit_game)
         .run();
 
     return ();
+}
+
+pub fn exit_game(
+    keyboard_input: Res<Input<KeyCode>>,
+    mut app_exit_event_writer: EventWriter<AppExit>,
+) {
+    if keyboard_input.just_pressed(KeyCode::Escape) {
+        app_exit_event_writer.send(AppExit);
+    }
 }
