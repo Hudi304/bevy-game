@@ -1,9 +1,5 @@
 pub mod camera;
 pub mod enemy;
-pub mod enemy_movement;
 pub mod player;
-pub mod player_hit_enemy;
-pub mod player_movement;
+pub mod score;
 pub mod star;
-pub mod player_hit_star;
-pub mod  score;

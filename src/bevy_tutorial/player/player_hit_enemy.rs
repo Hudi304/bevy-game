@@ -1,11 +1,14 @@
 use bevy::prelude::*;
 
-use crate::GameOverEvent;
-
-use super::{
-    enemy::Enemy, enemy_movement::ENEMY_SIZE, player::Player, player_movement::PLAYER_SIZE,
-    score::Score,
+use crate::{
+    bevy_tutorial::{
+        enemy::{enemy::Enemy, enemy_movement::ENEMY_SIZE},
+        score::Score,
+    },
+    GameOverEvent,
 };
+
+use super::{player::Player, player_movement::PLAYER_SIZE};
 
 pub fn player_hit_enemy(
     mut commands: Commands,

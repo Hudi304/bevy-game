@@ -1,11 +1,11 @@
 use bevy::prelude::*;
 
-use super::{
-    player::Player,
-    player_movement::PLAYER_SIZE,
+use crate::bevy_tutorial::{
     score::Score,
-    star::{Star, STAR_SIZE},
+    star::star::{Star, STAR_SIZE},
 };
+
+use super::{player::Player, player_movement::PLAYER_SIZE};
 
 pub fn player_hit_star(
     mut commands: Commands,

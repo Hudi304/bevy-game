@@ -1,38 +1,41 @@
 use bevy::{app::AppExit, prelude::*, window::WindowResolution};
 use bevy_tutorial::{
-    camera::spawn_camera,
-    enemy::{spawn_enemies_over_time, spawn_enemy, tick_spawn_enemies_timer, SpawnEnemyTimer},
-    enemy_movement::{confine_enemy_movement, enemy_movement, enemy_wall_collision},
-    player::spawn_player,
-    player_hit_enemy::player_hit_enemy,
-    player_hit_star::player_hit_star,
-    player_movement::{confine_player_movement, player_input},
+    camera::*,
+    enemy::{
+        enemy::{spawn_enemies_over_time, spawn_enemy, tick_spawn_enemies_timer, SpawnEnemyTimer},
+        enemy_movement::{confine_enemy_movement, enemy_movement, enemy_wall_collision},
+    },
+    player::{
+        player::spawn_player,
+        player_hit_enemy::player_hit_enemy,
+        player_hit_star::player_hit_star,
+        player_movement::{confine_player_movement, player_input},
+    },
     score::{update_score, Score},
-    star::{spawn_star, spawn_stars_over_time, tick_star_spawn_timer, StarSpawnTimer},
+    star::star::{spawn_star, spawn_stars_over_time, tick_star_spawn_timer, StarSpawnTimer},
 };
-use hex::{gizmos_system::gizmos_system, map::render_map};
 
 mod bevy_tutorial;
 mod common;
 mod hex;
 mod setup;
 
-use crate::setup::setup_camera_and_walls;
+// use crate::setup::setup_camera_and_walls;
 
 const _BACKGROUND_COLOR: Color = Color::rgb(0.9, 0.9, 0.9);
 
-fn _catan_clone() {
-    App::new()
-        .add_plugins(DefaultPlugins)
-        .insert_resource(ClearColor(_BACKGROUND_COLOR))
-        .insert_resource(FixedTime::new_from_secs(1.0 / 60.0))
-        .add_systems(Startup, setup_camera_and_walls)
-        .add_systems(Update, bevy::window::close_on_esc)
-        .add_systems(Update, gizmos_system)
-        .add_systems(Update, gizmos_system)
-        .add_systems(Update, render_map)
-        .run();
-}
+// fn _catan_clone() {
+//     App::new()
+//         .add_plugins(DefaultPlugins)
+//         .insert_resource(ClearColor(_BACKGROUND_COLOR))
+//         .insert_resource(FixedTime::new_from_secs(1.0 / 60.0))
+//         .add_systems(Startup, setup_camera_and_walls)
+//         .add_systems(Update, bevy::window::close_on_esc)
+//         .add_systems(Update, gizmos_system)
+//         .add_systems(Update, gizmos_system)
+//         .add_systems(Update, render_map)
+//         .run();
+// }
 
 fn main() {
     App::new()
@@ -55,7 +58,7 @@ fn main() {
         .add_systems(Startup, spawn_camera)
         // spawn entities
         .add_systems(Startup, spawn_player)
-        // .add_systems(Startup, spawn_enemy)
+        .add_systems(Startup, spawn_enemy)
         .add_systems(Startup, spawn_star)
         // player
         .add_systems(Update, player_input)
@@ -85,13 +88,15 @@ pub struct GameOverEvent {
 }
 
 // this fires on startup for some reason
+// TODO design some system to make sure that this does not happen anymore
+// Maybe raise a github issue
 pub fn exit_game(
     keyboard_input: Res<Input<KeyCode>>,
     mut app_exit_event_writer: EventWriter<AppExit>,
 ) {
     if keyboard_input.just_pressed(KeyCode::Escape) {
         println!("App exit");
-        app_exit_event_writer.send(AppExit);
+        // app_exit_event_writer.send(AppExit);
     }
 }
 
