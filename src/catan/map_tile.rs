@@ -20,32 +20,35 @@ pub enum TileType {
 
 #[derive(Component)]
 pub struct HexWorldTile {
-    center: Vec3,
+    cub_coord: CubCoord,
+    cart_coord: Vec3,
     // vertices: [Vec3; 6],
     // adjacent_tiles: [Box<HexWorldTile>; 6],
     // edges / roads -> 6
     // towns -> 6
     // richness -> u8
-    pub r: f32,
 }
 
 impl HexWorldTile {
     /// Builds a PrbBundle from a hex center and translates it.
     pub fn build(
-        center: Vec3,
+        cub_coord: CubCoord,
         material: Handle<StandardMaterial>,
         mesh: Handle<Mesh>,
     ) -> (PbrBundle, HexWorldTile) {
+        let h = 3_f32.sqrt() / 2. * 1.01;
+        let cart_coord = cub_coord.to_cartesian_vec3(h);
+
         return (
             PbrBundle {
                 mesh,
                 material,
-                transform: Transform::from_translation(center),
+                transform: Transform::from_translation(cart_coord),
                 ..default()
             },
             HexWorldTile {
-                center: center,
-                r: TILE_RADIUS,
+                cub_coord,
+                cart_coord,
             },
         );
     }
@@ -58,19 +61,6 @@ impl HexWorldTile {
 
         return hex_tile_mesh;
     }
-}
-
-pub fn build_map_gird(coords: Vec<CubCoord>, h: f32) -> Vec<(Vec3, Color)> {
-    coords
-        .iter()
-        .map(|coord| {
-            if coord.ring > 3 {
-                return (coord.to_cartesian_vec3(h), Color::BLUE);
-            } else {
-                return (coord.to_cartesian_vec3(h), Color::GREEN);
-            }
-        })
-        .collect()
 }
 
 pub fn build_cub_coord_hex_gird(radius: i32) -> Vec<CubCoord> {
@@ -97,14 +87,18 @@ pub fn test_tile(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
-    let h = 3_f32.sqrt() / 2. * 1.01;
+    // let h = 3_f32.sqrt() / 2. * 1.01;
     let cub_coords_arr: Vec<CubCoord> = build_cub_coord_hex_gird(7);
-    let hex_arr: Vec<(Vec3, Color)> = build_map_gird(cub_coords_arr, h);
 
-    for (center, color) in hex_arr {
-        let material: Handle<StandardMaterial> = materials.add(color.into());
+    for cub_coord in cub_coords_arr {
+        let mut material: Handle<StandardMaterial> = materials.add(Color::BLUE.into());
+
+        if cub_coord.ring < 4 {
+            material = materials.add(Color::GREEN.into());
+        }
+
         let mesh: Handle<Mesh> = meshes.add(HexWorldTile::build_hex_mesh(PI / 6.));
-        let ent = HexWorldTile::build(center, material, mesh);
+        let ent = HexWorldTile::build(cub_coord, material, mesh);
         commands.spawn(ent);
     }
 }
