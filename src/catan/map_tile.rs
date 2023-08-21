@@ -214,3 +214,15 @@ pub fn spawn_map(
         }
     }
 }
+
+pub fn spawn_tile_richness_text(mut commands: Commands, tile_query: Query<&HexWorldTile>) {
+    let tile_iter = tile_query.iter();
+
+    for tile_ent in tile_iter {
+        let center = tile_ent.cart_coord;
+
+        
+    }
+
+    return ();
+}
