@@ -8,39 +8,10 @@ use crate::{
     hex::polygon::{build_polygon_mesh, get_polygon_vert_with_center},
 };
 
+use super::tile_type::TileType;
+
 pub const TILE_RADIUS: f32 = 1.0;
-
-#[derive(Debug, Clone, PartialEq, Copy)]
-pub enum TileType {
-    /// 4
-    WHEAT,
-    /// 3
-    STONE,
-    /// 4
-    SHEEP,
-    /// 3
-    CLAY,
-    /// 4
-    WOOD,
-    /// 1
-    DESERT,
-    /// ANY
-    WATER,
-}
-
-impl TileType {
-    fn into_color(&self) -> Color {
-        match self {
-            TileType::WHEAT => Color::YELLOW,
-            TileType::CLAY => Color::ORANGE,
-            TileType::STONE => Color::DARK_GRAY,
-            TileType::SHEEP => Color::LIME_GREEN,
-            TileType::WOOD => Color::DARK_GREEN,
-            TileType::DESERT => Color::YELLOW_GREEN,
-            TileType::WATER => Color::BLUE,
-        }
-    }
-}
+pub const NUMBER_OF_TILES: usize = 1 + 6 + 12; // 19 default tiles
 
 #[derive(Component)]
 pub struct HexWorldTile {
@@ -79,15 +50,15 @@ impl HexWorldTile {
             },
         );
     }
+}
 
-    pub fn build_hex_mesh(offset_angle: f32) -> Mesh {
-        // center + 6 vertices
-        let hex_tile_vertex_vec = get_polygon_vert_with_center(6, TILE_RADIUS, offset_angle);
-        // vertices + edges + normals + uvs
-        let hex_tile_mesh: Mesh = build_polygon_mesh(&hex_tile_vertex_vec);
+pub fn build_hex_mesh(offset_angle: f32) -> Mesh {
+    // center + 6 vertices
+    let hex_tile_vertex_vec = get_polygon_vert_with_center(6, TILE_RADIUS, offset_angle);
+    // vertices + edges + normals + uvs
+    let hex_tile_mesh: Mesh = build_polygon_mesh(&hex_tile_vertex_vec);
 
-        return hex_tile_mesh;
-    }
+    return hex_tile_mesh;
 }
 
 pub fn build_cub_coord_hex_gird(radius: i32) -> Vec<CubCoord> {
@@ -109,29 +80,34 @@ pub fn build_cub_coord_hex_gird(radius: i32) -> Vec<CubCoord> {
     return hex_arr;
 }
 
+/// Takes in a type_counter_array (Vec<(TileType, i32, i32)>), and a TileType \
+/// Returns a new vector that does not contain the provided type
 fn filter_type_out_with_ints(
-    type_vec: &Vec<(TileType, i32, i32)>,
-    f: TileType,
+    type_counter_arr: &Vec<(TileType, i32, i32)>,
+    tile_type: TileType,
 ) -> Vec<(TileType, i32, i32)> {
+    // TODO empty guard
     let mut result = Vec::new();
 
-    type_vec.iter().for_each(|(el, max, actual)| {
-        if *el != f {
+    type_counter_arr.iter().for_each(|(el, max, actual)| {
+        if *el != tile_type {
             result.push((el.clone(), *max, *actual))
         }
     });
 
-    println!("{:?} | {:?}", f, result);
+    // println!("{:?} | {:?}", tile_type, result);
     return result;
 }
 
 // TODO refactor this into a nice method sometime
-fn build_tile_type_arr() -> Vec<TileType> {
-    let no_of_tiles = 1 + 6 + 12;
-    let mut tile_type_arr = Vec::<TileType>::with_capacity(no_of_tiles);
+/// Returns an array with the specified size of random TileTypes.\
+/// There are rules of how many types of tiles there can be in the array.\
+/// The rules are hard coded.
+fn build_tile_type_arr(size: usize) -> Vec<TileType> {
+    let mut result: Vec<TileType> = Vec::with_capacity(size);
 
     // Tile type, max number of tiles, current number of tiles
-    let mut type_arr: Vec<(TileType, i32, i32)> = vec![
+    let mut type_counter_arr: Vec<(TileType, i32, i32)> = vec![
         (TileType::CLAY, 3, 0),
         (TileType::DESERT, 1, 0),
         (TileType::SHEEP, 4, 0),
@@ -140,25 +116,25 @@ fn build_tile_type_arr() -> Vec<TileType> {
         (TileType::WOOD, 4, 0),
     ];
 
-    for _ in 0..no_of_tiles {
-        let rand_pos = random::<f32>() * type_arr.len() as f32;
+    for _ in 0..size {
+        let rand_pos = random::<f32>() * type_counter_arr.len() as f32;
         let rand_pos = rand_pos as usize;
         // Increment actual
-        type_arr[rand_pos].2 += 1;
+        type_counter_arr[rand_pos].2 += 1;
 
-        let (rand_type, max, actual) = type_arr[rand_pos];
+        let (rand_type, max, actual) = type_counter_arr[rand_pos];
 
         // if actual got to max, we generated as many tiles as we need
         // remove the type from the type array, so it can not be generated again
         if actual == max {
-            let arr = filter_type_out_with_ints(&type_arr, rand_type);
-            type_arr = arr;
+            let arr = filter_type_out_with_ints(&type_counter_arr, rand_type);
+            type_counter_arr = arr;
         }
 
-        tile_type_arr.push(rand_type.clone());
+        result.push(rand_type.clone());
     }
 
-    return tile_type_arr;
+    return result;
 }
 
 pub fn test_tile(
@@ -170,20 +146,20 @@ pub fn test_tile(
     let cub_coords_arr: Vec<CubCoord> = build_cub_coord_hex_gird(7);
 
     let mut i = 0;
-    let tile_type_arr = build_tile_type_arr();
+    let tile_type_arr = build_tile_type_arr(NUMBER_OF_TILES);
 
     for cub_coord in cub_coords_arr {
+        // TODO refactor this so the HexWorldTile contains the material asset and the mesh asset
         if cub_coord.ring < 3 {
             let tile_type = tile_type_arr[i];
-
             let material = materials.add(tile_type.into_color().into());
-            let mesh: Handle<Mesh> = meshes.add(HexWorldTile::build_hex_mesh(PI / 6.));
+            let mesh: Handle<Mesh> = meshes.add(build_hex_mesh(PI / 6.));
             let ent = HexWorldTile::build(cub_coord, material, mesh, tile_type);
             commands.spawn(ent);
             i += 1;
         } else {
             let material = materials.add(Color::BLUE.into());
-            let mesh: Handle<Mesh> = meshes.add(HexWorldTile::build_hex_mesh(PI / 6.));
+            let mesh: Handle<Mesh> = meshes.add(build_hex_mesh(PI / 6.));
             let ent = HexWorldTile::build(cub_coord, material, mesh, TileType::WATER);
             commands.spawn(ent);
         }
