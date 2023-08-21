@@ -1,8 +1,11 @@
-use std::f32::consts::PI;
+use std::{f32::consts::PI, ops::Range};
 
 use bevy::prelude::*;
 
-use crate::hex::polygon::{build_polygon_mesh, get_hex_vertices, get_polygon_vert_with_center};
+use crate::{
+    common::cube_coordinates::CubCoord,
+    hex::polygon::{build_polygon_mesh, get_hex_vertices, get_polygon_vert_with_center},
+};
 
 pub const TILE_RADIUS: f32 = 1.0;
 
@@ -71,50 +74,100 @@ pub fn hex(
     return HexWorldTile::build(center, material.clone(), mesh.clone());
 }
 
+pub fn build_map_gird(coords: Vec<CubCoord>, h: f32) -> Vec<(Vec3, Color)> {
+    coords
+        .iter()
+        .map(|coord| {
+            if coord.ring > 3 {
+                return (coord.to_cartesian_vec3(h), Color::BLUE);
+            } else {
+                return (coord.to_cartesian_vec3(h), Color::GREEN);
+            }
+        })
+        .collect()
+}
+
+pub fn build_cub_coord_hex_gird(radius: i32) -> Vec<CubCoord> {
+    let mut hex_arr = vec![];
+
+    let slice: Range<i32> = -radius..radius + 1;
+
+    for q in slice.clone() {
+        for r in slice.clone() {
+            let s: i32 = 0 - q - r;
+
+            if s.abs() > radius {
+                continue;
+            }
+
+            hex_arr.push(CubCoord::from_tuple((q, r, s)));
+        }
+    }
+
+    return hex_arr;
+}
+
 pub fn test_tile(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
-    let material: Handle<StandardMaterial> = materials.add(Color::GREEN.into());
-    let h = 3_f32.sqrt() / 2.;
+    let h = 3_f32.sqrt() / 2. * 1.01;
 
-    // TODO try to offset it by PI / 6
-    // let u = |c: Vec3| (c.x + c.y / 2. - c.z / 2.0) * 2.;
-    // let v = |c: Vec3| ((c.y + c.z) * 3_f32.sqrt() / 2.) * 2.;
-    // let uv = |c: Vec3| Vec3::new(u(c), v(c), 0.0);
+    // let x = |v: Vec3| (v.x + v.y / 2.) * 2. * h;
+    // let y = |v: Vec3| (v.y * 3_f32.sqrt() / 2.) * 2. * h;
+    // let xy = |v: Vec3| Vec3::new(1.01 * x(v), 1.01 * y(v), 0.0);
+    // let mut hex_arr = vec![];
 
-    let x = |v: Vec3| (v.x + v.y / 2.) * 2. * h;
-    let y = |v: Vec3| (v.y * 3_f32.sqrt() / 2.) * 2. * h;
+    let cub_coords_arr: Vec<CubCoord> = build_cub_coord_hex_gird(7);
 
-    let xy = |v: Vec3| Vec3::new(1.01 * x(v), 1.01 * y(v), 0.0);
+    // hex_arr.iter().for_each(|el| println!("{:?}", el));
 
-    let mut hex_arr = vec![];
+    println!();
+    // for q in -3..4 {
+    //     for r in -3..4 {
+    //         let s: i32 = q + r;
 
-    for q in -2..3 {
-        for r in -2..3 {
-            let s: i32 = q + r;
-            if s.abs() > 2 {
-                continue;
-            }
+    //         if s.abs() > 3 {
+    //             continue;
+    //         }
 
-            let cub_pos = Vec3::new(q as f32, r as f32, s as f32);
-            hex_arr.push((xy(cub_pos), Color::GREEN));
-        }
-    }
+    //         let cub_coord = CubCoord::from_tuple((q, r, s));
 
-    for q in -3..4 {
-        for r in -3..4 {
-            let s: i32 = q + r;
-            let sum = q.abs() + r.abs() + s.abs();
-            if s.abs() > 3 || sum <6 {
-                continue;
-            }
+    //         if cub_coord.ring == 3 {
+    //             hex_arr.push((cub_coord.to_cartesian_vec3(h), Color::BLUE));
+    //         } else {
+    //             hex_arr.push((cub_coord.to_cartesian_vec3(h), Color::GREEN));
+    //         }
+    //     }
+    // }
 
-            let cub_pos = Vec3::new(q as f32, r as f32, s as f32);
-            hex_arr.push((xy(cub_pos), Color::BLUE));
-        }
-    }
+    // for q in -2..3 {
+    //     for r in -2..3 {
+    //         let s: i32 = q + r;
+    //         if s.abs() > 2 {
+    //             continue;
+    //         }
+
+    //         let cub_pos = Vec3::new(q as f32, r as f32, s as f32);
+    //         hex_arr.push((xy(cub_pos), Color::GREEN));
+    //     }
+    // }
+
+    // for q in -3..4 {
+    //     for r in -3..4 {
+    //         let s: i32 = q + r;
+    //         let sum = q.abs() + r.abs() + s.abs();
+    //         if s.abs() > 3 || sum < 6 {
+    //             continue;
+    //         }
+
+    //         let cub_pos = Vec3::new(q as f32, r as f32, s as f32);
+    //         hex_arr.push((xy(cub_pos), Color::BLUE));
+    //     }
+    // }
+
+    let hex_arr = build_map_gird(cub_coords_arr, h);
 
     for (pos, color) in hex_arr {
         let material: Handle<StandardMaterial> = materials.add(color.into());

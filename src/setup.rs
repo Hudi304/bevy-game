@@ -1,6 +1,5 @@
 use bevy::prelude::*;
 
-use crate::common::{wall_bundle::WallBundle, wall_location::WallLocation};
 // Add the game's entities to our world
 pub fn setup_camera_and_walls(
     mut commands: Commands,
