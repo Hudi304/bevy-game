@@ -13,6 +13,12 @@ pub struct CubCoord {
 // let v = |c: Vec3| ((c.y + c.z) * 3_f32.sqrt() / 2.) * 2.;
 // let uv = |c: Vec3| Vec3::new(u(c), v(c), 0.0);
 
+// old formulas
+// let x = |v: Vec3| (v.x + v.y / 2.) * 2. * h;
+// let y = |v: Vec3| (v.y * 3_f32.sqrt() / 2.) * 2. * h;
+// let xy = |v: Vec3| Vec3::new(1.01 * x(v), 1.01 * y(v), 0.0);
+// let mut hex_arr = vec![];
+
 impl CubCoord {
     pub fn new(q: i32, r: i32, s: i32) -> CubCoord {
         let ring = (q.abs() + r.abs() + s.abs()) / 2;
