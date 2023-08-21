@@ -91,21 +91,37 @@ pub fn test_tile(
 
     let mut hex_arr = vec![];
 
-    for q in -3..4 {
-        for r in -3..4 {
+    for q in -2..3 {
+        for r in -2..3 {
             let s: i32 = q + r;
-            if s.abs() > 3 {
+            if s.abs() > 2 {
                 continue;
             }
 
             let cub_pos = Vec3::new(q as f32, r as f32, s as f32);
-            hex_arr.push(xy(cub_pos));
+            hex_arr.push((xy(cub_pos), Color::GREEN));
         }
     }
 
-    for pos in hex_arr {
+    for q in -3..4 {
+        for r in -3..4 {
+            let s: i32 = q + r;
+            let sum = q.abs() + r.abs() + s.abs();
+            if s.abs() > 3 || sum <6 {
+                continue;
+            }
+
+            let cub_pos = Vec3::new(q as f32, r as f32, s as f32);
+            hex_arr.push((xy(cub_pos), Color::BLUE));
+        }
+    }
+
+    for (pos, color) in hex_arr {
+        let material: Handle<StandardMaterial> = materials.add(color.into());
         let center_tile_mesh = HexWorldTile::build_hex_mesh(PI / 6.);
         let mesh = meshes.add(center_tile_mesh);
-        commands.spawn(hex(pos, &material, &mesh));
+        let ent = hex(pos, &material, &mesh);
+
+        commands.spawn(ent);
     }
 }
