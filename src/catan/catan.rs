@@ -1,6 +1,6 @@
 use bevy::{prelude::*, window::WindowResolution};
 
-use super::{camera::spawn_3d_camera, map_tile::test_tile};
+use super::{camera::spawn_3d_camera, map_tile::spawn_map};
 
 pub struct Catan;
 
@@ -33,6 +33,6 @@ impl Plugin for Catan {
         .insert_resource(ClearColor(BACKGROUND_COLOR))
         .insert_resource(FixedTime::new_from_secs(1.0 / 60.0))
         .add_systems(Startup, spawn_3d_camera)
-        .add_systems(Startup, test_tile);
+        .add_systems(Startup, spawn_map);
     }
 }
