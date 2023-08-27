@@ -6,7 +6,7 @@ use bevy::{
 use super::{
     camera::spawn_3d_camera,
     map_tile::spawn_map,
-    mouse_controls::{mouse_motion, non_rotating_camera_tile_collision}, circle::spawn_3d_quad,
+    mouse_controls::{mouse_motion, non_rotating_camera_tile_collision}, circle::{spawn_3d_quad, spawn_circ_bevy},
 };
 
 pub struct Catan;
@@ -44,10 +44,12 @@ impl Plugin for Catan {
         .add_systems(Startup, spawn_3d_camera)
         // .add_systems(Startup, spawn_map)
         // .add_systems(Startup, )
-        // .add_systems(Startup, spawn_map)
+        .add_systems(Startup, spawn_map)
         // .add_systems(Update, mouse_motion)
         // .add_systems(Startup, spawn_circle)
-        .add_systems(Startup, spawn_3d_quad)
+        .add_systems(Startup, spawn_circ_bevy)
+
+        // .add_systems(Startup, spawn_3d_quad)
         .add_systems(Update, non_rotating_camera_tile_collision);
     }
 }

@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 
+use bevy::prelude::shape::Circle;
 use bevy::render::mesh::Indices;
 use bevy::render::render_resource::PrimitiveTopology;
 
@@ -67,6 +68,22 @@ fn build_circle_indices(num_of_edges: u32) -> Indices {
     return Indices::U32(result);
 }
 
+pub fn spawn_circ_bevy(
+    mut commands: Commands,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<StandardMaterial>>,
+) {
+    let circ = Circle::new(1.0);
 
+    let circ_mesh: Mesh = circ.into();
 
-
+    commands.spawn((
+        PbrBundle {
+            mesh: meshes.add(circ_mesh),
+            material: materials.add(Color::PURPLE.into()),
+            transform: Transform::from_xyz(0.0, 0.0, 0.1),
+            ..default()
+        },
+        WorldCircle {},
+    ));
+}
