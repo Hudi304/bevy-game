@@ -12,3 +12,5 @@ pub fn spawn_3d_camera(mut commands: Commands) {
         ..Default::default()
     });
 }
+
+// pub fn debug_window(window_query: Query<&Window, With<PrimaryWindow>>) {}
