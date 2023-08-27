@@ -87,4 +87,21 @@ pub fn spawn_pan_camera(mut commands: Commands) {
             ..Default::default()
         },
     ));
+
+    commands.spawn(PointLightBundle {
+        transform: Transform::from_translation(Vec3::new(0., 0., 20.)),
+        point_light: PointLight {
+            intensity: 2000.0,
+            ..default()
+        },
+        ..default()
+    });
+
+    commands.spawn(DirectionalLightBundle {
+        directional_light: DirectionalLight {
+            illuminance: 1_000.0,
+            ..default()
+        },
+        ..default()
+    });
 }
