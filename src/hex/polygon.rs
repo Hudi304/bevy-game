@@ -5,6 +5,8 @@ use bevy::{
     render::{mesh::Indices, render_resource::PrimitiveTopology},
 };
 
+use crate::catan::utils::vec::vec3_to_vec;
+
 /// Returns the vertices of a polygon as a Vec<Vec3>. \
 /// The first element is the center.
 pub fn get_polygon_vert_with_center(vert_no: usize, radius: f32, offset_angle: f32) -> Vec<Vec3> {
@@ -61,14 +63,6 @@ pub fn get_hex_vertices(radius: f32, offset_angle: f32) -> Vec<Vec3> {
     }
 
     return vertex_vector;
-}
-
-pub fn vec_to_vec3([x, y, z]: [f32; 3]) -> Vec3 {
-    return Vec3 { x, y, z };
-}
-
-pub fn vec3_to_vec(vec: &Vec3) -> [f32; 3] {
-    return [vec[0], vec[1], vec[2]];
 }
 
 pub fn build_polygon_mesh(vertex_vector: &Vec<Vec3>) -> Mesh {

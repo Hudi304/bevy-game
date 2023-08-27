@@ -24,7 +24,7 @@ impl CubCoord {
         let ring = (q.abs() + r.abs() + s.abs()) / 2;
         CubCoord { q, r, s, ring }
     }
-    pub fn from_qrs(q: i32, r: i32, s: i32) -> CubCoord {
+    pub fn _from_qrs(q: i32, r: i32, s: i32) -> CubCoord {
         CubCoord::new(q, r, s)
     }
 
@@ -32,14 +32,14 @@ impl CubCoord {
         CubCoord::new(q, r, s)
     }
     /// Rounds x,y,z into i32
-    pub fn from_vec(vec: Vec3) -> CubCoord {
+    pub fn _from_vec(vec: Vec3) -> CubCoord {
         let q: i32 = vec.x.round() as i32;
         let r: i32 = vec.y.round() as i32;
         let s: i32 = vec.z.round() as i32;
         CubCoord::new(q, r, s)
     }
     /// Rounds arr[x,y,z] into i32
-    pub fn from_arr(arr: [f32; 3]) -> CubCoord {
+    pub fn _from_arr(arr: [f32; 3]) -> CubCoord {
         let q: i32 = arr[0].round() as i32;
         let r: i32 = arr[1].round() as i32;
         let s: i32 = arr[2].round() as i32;
@@ -56,7 +56,7 @@ impl CubCoord {
         Vec3::new(x, y, z)
     }
 
-    pub fn to_cartesian_vec2(&self, h: f32) -> Vec2 {
+    pub fn _to_cartesian_vec2(&self, h: f32) -> Vec2 {
         let q = self.s as f32;
         let r = self.q as f32;
 

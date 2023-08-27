@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
 // Add the game's entities to our world
-pub fn setup_camera_and_walls(
+pub fn _setup_camera_and_walls(
     mut commands: Commands,
     mut _meshes: ResMut<Assets<Mesh>>,
     mut _materials: ResMut<Assets<StandardMaterial>>,

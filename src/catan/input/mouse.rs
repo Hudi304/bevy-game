@@ -1,11 +1,11 @@
-use bevy::{input::mouse::MouseMotion, prelude::*, window::PrimaryWindow};
+use bevy::{prelude::*, window::PrimaryWindow};
 
-use super::map_tile::HexWorldTile;
+use crate::catan::world::hex_tile::HexWorldTile;
 
 // TODO there can be more then one CursorMoved event per frame
 // TODO I don't think it's necessary to do the calculation, more then once per frame
 // we're not going for shooter precision here
-pub fn non_rotating_camera_tile_collision(
+pub fn _non_rotating_camera_tile_collision(
     mut tile_query: Query<(&mut Transform, &HexWorldTile)>,
     mut cursor_moved_events: EventReader<CursorMoved>,
     window_query: Query<&Window, With<PrimaryWindow>>,
@@ -20,7 +20,7 @@ pub fn non_rotating_camera_tile_collision(
 
     let cursor_position: Vec2 = last.unwrap().position;
 
-    let cursor_position = get_circle_position(cursor_position, window);
+    let cursor_position = _get_circle_position(cursor_position, window);
 
     let cursor_position = Vec3::new(cursor_position.x, cursor_position.y, 0.0);
     for (mut tile_transform, _) in tile_query.iter_mut() {
@@ -32,7 +32,7 @@ pub fn non_rotating_camera_tile_collision(
     }
 }
 
-fn get_circle_position(cursor_position: Vec2, window: &Window) -> Vec3 {
+fn _get_circle_position(cursor_position: Vec2, window: &Window) -> Vec3 {
     // w_h / 2 -> y 0
     // w_w / 2 -> x 0
 

@@ -1,18 +1,16 @@
-use std::f32::consts::PI;
-
 use bevy::{input::mouse::MouseMotion, prelude::*};
 /// Tags an entity as capable of panning and orbiting.
 #[derive(Component)]
-pub struct PanOrbitCamera {
+pub struct OrbitCamera {
     /// The "focus point" to orbit around. It is automatically updated when panning the camera
     pub focus: Vec3,
     pub upside_down: bool,
     pub last_motion_delta: Vec2,
 }
 
-impl Default for PanOrbitCamera {
+impl Default for OrbitCamera {
     fn default() -> Self {
-        PanOrbitCamera {
+        OrbitCamera {
             focus: Vec3::ZERO,
             upside_down: false,
             last_motion_delta: Vec2::ZERO,
@@ -24,7 +22,7 @@ impl Default for PanOrbitCamera {
 pub fn pan_orbit_camera(
     input_mouse: Res<Input<MouseButton>>,
     mut ev_motion: EventReader<MouseMotion>,
-    mut camera_query: Query<(&mut PanOrbitCamera, &mut Transform)>,
+    mut camera_query: Query<(&mut OrbitCamera, &mut Transform)>,
 ) {
     // change input mapping for orbit and panning here
     let orbit_button = MouseButton::Right;
@@ -59,7 +57,8 @@ pub fn pan_orbit_camera(
             // println!("{} {} ", delta_pos.x, delta_pos.y);
 
             let multiplication_factor = 0.1;
-            let delta_pos = (orbit_cam.last_motion_delta - mouse_motion.delta) * multiplication_factor;
+            let delta_pos =
+                (orbit_cam.last_motion_delta - mouse_motion.delta) * multiplication_factor;
 
             let xf_rot2d = Transform::from_rotation(Quat::from_euler(
                 EulerRot::XYZ,
@@ -96,7 +95,7 @@ pub fn spawn_pan_camera(mut commands: Commands) {
             transform: camera_transform,
             ..Default::default()
         },
-        PanOrbitCamera {
+        OrbitCamera {
             ..Default::default()
         },
     ));

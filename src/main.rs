@@ -3,7 +3,6 @@ use bevy_tutorial::{exit_game::GameOverEvent, BallGame};
 use catan::catan::Catan;
 
 mod bevy_tutorial;
-mod common;
 mod hex;
 mod setup;
 
