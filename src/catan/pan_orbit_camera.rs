@@ -48,15 +48,28 @@ pub fn pan_orbit_camera(
             //     orbit_cam.last_motion_delta = mouse_motion.delta;
             // }
 
-            let delta_pos = orbit_cam.last_motion_delta - mouse_motion.delta;
+            // let delta_pos = orbit_cam.last_motion_delta - mouse_motion.delta;
 
-            let angle_const = PI / 180. / 10.;
+            // let angle_const = PI / 180. / 10.;
 
-            let quat_x = Quat::from_rotation_y(delta_pos.x * angle_const);
-            let quat_y = Quat::from_rotation_x(delta_pos.y * angle_const);
-            let quat_z = Quat::from_rotation_z(0.0);
+            // let quat_x = Quat::from_rotation_y(delta_pos.x * angle_const);
+            // let quat_y = Quat::from_rotation_x(delta_pos.y * angle_const);
+            // let quat_z = Quat::from_rotation_z(0.0);
 
-            camera_transform.rotate(quat_x * quat_y * quat_z);
+            // println!("{} {} ", delta_pos.x, delta_pos.y);
+
+            let multiplication_factor = 0.1;
+            let delta_pos = (orbit_cam.last_motion_delta - mouse_motion.delta) * multiplication_factor;
+
+            let xf_rot2d = Transform::from_rotation(Quat::from_euler(
+                EulerRot::XYZ,
+                (delta_pos.y).to_radians(),
+                (delta_pos.x).to_radians(),
+                (0.0_f32).to_radians(),
+            ));
+
+            camera_transform.rotate(xf_rot2d.rotation);
+            // camera_transform.rotate(quat_x * quat_y * quat_z);
             orbit_cam.last_motion_delta = mouse_motion.delta;
         }
     }
