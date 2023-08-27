@@ -9,7 +9,7 @@ use super::{
     circle::{spawn_3d_quad, spawn_circ_bevy},
     map_tile::spawn_map,
     mouse_controls::non_rotating_camera_tile_collision,
-    pan_orbit_camera::{spawn_pan_camera, pan_orbit_camera},
+    pan_orbit_camera::{pan_orbit_camera, spawn_pan_camera},
 };
 
 pub struct Catan;
@@ -43,12 +43,13 @@ impl Plugin for Catan {
         // .add_systems(Startup, spawn_3d_camera)
         .add_systems(Startup, spawn_pan_camera)
         .add_systems(Update, pan_orbit_camera)
-
         .insert_resource(ClearColor(BACKGROUND_COLOR))
         .insert_resource(FixedTime::new_from_secs(1.0 / 60.0))
         .add_systems(Startup, spawn_map)
         .add_systems(Startup, spawn_circ_bevy)
-        .add_systems(Update, non_rotating_camera_tile_collision);
+        // .add_systems(Update, non_rotating_camera_tile_collision);
+        .add_plugin(LogDiagnosticsPlugin::default())
+        .add_plugin(FrameTimeDiagnosticsPlugin::default());
 
         return ();
     }
