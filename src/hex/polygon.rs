@@ -43,7 +43,7 @@ pub fn get_polygon_vert_with_center(vert_no: usize, radius: f32, offset_angle: f
 
 /// Returns the vertices of a polygon as a Vec<Vec3>. \
 /// The first element is the center.
-pub fn get_hex_vertices(radius: f32, offset_angle: f32) -> Vec<Vec3> {
+pub fn _get_hex_vertices(radius: f32, offset_angle: f32) -> Vec<Vec3> {
     let mut vertex_vector = Vec::with_capacity(6);
     let vert_no_f32 = 6.0;
 

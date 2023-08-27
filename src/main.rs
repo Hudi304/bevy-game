@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use bevy_tutorial::{exit_game::GameOverEvent, BallGame};
+use bevy_tutorial::exit_game::GameOverEvent;
 use catan::catan::Catan;
 
 mod bevy_tutorial;

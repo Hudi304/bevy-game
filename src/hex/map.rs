@@ -2,12 +2,9 @@ use std::f32::consts::PI;
 
 use bevy::prelude::*;
 
-use super::{
-    hex::get_hex_vertices_with_center,
-    polygon::{build_polygon_mesh, get_polygon_vert_with_center},
-};
+use super::{polygon::{build_polygon_mesh, get_polygon_vert_with_center}, hex::_get_hex_vertices_with_center};
 
-pub fn render_map(
+pub fn _render_map(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
@@ -24,10 +21,10 @@ pub fn render_map(
     // tile positions
 
     // center and first circle
-    let mut tile_pos_vec1 = get_hex_vertices_with_center(1.8, PI / 6.);
+    let mut tile_pos_vec1 = _get_hex_vertices_with_center(1.8, PI / 6.);
 
     // outer circle
-    let outer_circle = get_hex_vertices_with_center(3.1, 0.0);
+    let outer_circle = _get_hex_vertices_with_center(3.1, 0.0);
     let outer_circle: Vec<[f32; 3]> = outer_circle.iter().skip(1).cloned().collect();
 
     tile_pos_vec1.extend(outer_circle);

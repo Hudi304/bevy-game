@@ -1,4 +1,4 @@
-use bevy::{prelude::*, window::WindowResolution, diagnostic::{LogDiagnosticsPlugin, FrameTimeDiagnosticsPlugin}};
+use bevy::{prelude::*, window::WindowResolution};
 
 use self::{
     camera::spawn_camera,
@@ -29,8 +29,8 @@ impl Plugin for BallGame {
             }),
             ..default()
         }))
-        .add_plugin(LogDiagnosticsPlugin::default())
-        .add_plugin(FrameTimeDiagnosticsPlugin::default())
+        // .add_plugin(LogDiagnosticsPlugin::default())
+        // .add_plugin(FrameTimeDiagnosticsPlugin::default())
         .init_resource::<Score>()
         .add_event::<GameOverEvent>()
         .add_systems(Startup, spawn_camera)

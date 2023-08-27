@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-pub fn gizmos_system(mut gizmos: Gizmos, _time: Res<Time>) {
+pub fn _gizmos_system(mut gizmos: Gizmos, _time: Res<Time>) {
     // let sin = time.elapsed_seconds().sin() * 50.;
 
     let r = 6.;
