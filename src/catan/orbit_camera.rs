@@ -1,4 +1,5 @@
 use bevy::{input::mouse::MouseMotion, prelude::*};
+use bevy_mod_picking::prelude::RaycastPickCamera;
 /// Tags an entity as capable of panning and orbiting.
 #[derive(Component)]
 pub struct OrbitCamera {
@@ -19,7 +20,7 @@ impl Default for OrbitCamera {
 }
 
 /// Pan the camera with middle mouse click, zoom with scroll wheel, orbit with right mouse click.
-pub fn pan_orbit_camera(
+pub fn update_camera_rotation(
     input_mouse: Res<Input<MouseButton>>,
     mut ev_motion: EventReader<MouseMotion>,
     mut camera_query: Query<(&mut OrbitCamera, &mut Transform)>,
@@ -98,6 +99,7 @@ pub fn spawn_orbit_camera(mut commands: Commands) {
         OrbitCamera {
             ..Default::default()
         },
+        RaycastPickCamera::default(),
     ));
 
     commands.spawn(PointLightBundle {

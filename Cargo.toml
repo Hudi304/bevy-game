@@ -7,7 +7,9 @@ edition = "2021"
 
 [dependencies]
 bevy = { version = "0.11.0", features = ["dynamic_linking"] }
-bevy_mod_picking = "0.15.0"
+bevy_egui = "0.21.0"
+bevy_eventlistener = "0.3.0"
+bevy_mod_picking = { verison = "0.15.0" }
 rand = "0.8.5"
 
 [workspace]

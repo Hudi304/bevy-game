@@ -1,7 +1,11 @@
 use std::{f32::consts::PI, ops::Range};
 
 use bevy::prelude::*;
-use bevy_mod_picking::prelude::{Listener, On, Over, Pointer};
+
+use bevy_mod_picking::{
+    prelude::{Click, On, Out, Over, Pointer, PointerButton, RaycastPickTarget},
+    PickableBundle,
+};
 
 use crate::catan::cubic_coords::cube_coordinates::CubCoord;
 
@@ -40,9 +44,28 @@ pub fn spawn_map(
             commands.spawn((
                 prb_bundle,
                 component,
-                On::<Pointer<Over>>::run(|param: Listener<Pointer<Over>>| {
-                    println!("{:?} ", param);
+                PickableBundle::default(),
+                On::<Pointer<Click>>::target_commands_mut(|click, target_commands| {
+                    if click.target != click.listener() && click.button == PointerButton::Secondary
+                    {
+                        println!("in if");
+
+                        target_commands.despawn();
+                    }
+
+                    println!("outside if");
                 }),
+                On::<Pointer<Over>>::target_component_mut::<Transform>(|_, transform| {
+                    let mut old_translation = transform.translation;
+                    old_translation.z = 0.2;
+                    transform.translation = old_translation
+                }),
+                On::<Pointer<Out>>::target_component_mut::<Transform>(|_, transform| {
+                    let mut old_translation = transform.translation;
+                    old_translation.z = 0.0;
+                    transform.translation = old_translation
+                }),
+                RaycastPickTarget::default(),
             ));
 
             i += 1;
