@@ -77,7 +77,7 @@ pub fn pan_orbit_camera(
 }
 
 /// Spawn a camera like this
-pub fn spawn_pan_camera(mut commands: Commands) {
+pub fn spawn_orbit_camera(mut commands: Commands) {
     let translation = Vec3::new(0.0, 0.0, 15.0);
 
     let camera_transform = Transform::from_translation(translation)
