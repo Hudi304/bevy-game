@@ -1,12 +1,14 @@
 use bevy::{
+    diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin},
     prelude::*,
     window::{WindowResolution, WindowTheme},
 };
 
 use super::{
     camera::spawn_3d_camera,
+    circle::{spawn_3d_quad, spawn_circ_bevy},
     map_tile::spawn_map,
-    mouse_controls::{mouse_motion, non_rotating_camera_tile_collision}, circle::{spawn_3d_quad, spawn_circ_bevy},
+    mouse_controls::{mouse_motion, non_rotating_camera_tile_collision},
 };
 
 pub struct Catan;
@@ -31,8 +33,6 @@ impl Plugin for Catan {
     fn build(&self, app: &mut App) {
         app.add_plugins(DefaultPlugins.set(WindowPlugin {
             primary_window: Some(Window {
-                window_theme: Some(WindowTheme::Dark),
-
                 window_level: bevy::window::WindowLevel::AlwaysOnTop,
                 resolution: WindowResolution::new(600.0, 400.0),
                 ..default()
@@ -40,7 +40,7 @@ impl Plugin for Catan {
             ..default()
         }))
         .insert_resource(ClearColor(BACKGROUND_COLOR))
-        .insert_resource(FixedTime::new_from_secs(1.0 / 60.0))
+        // .insert_resource(FixedTime::new_from_secs(1.0 / 60.0))
         .add_systems(Startup, spawn_3d_camera)
         // .add_systems(Startup, spawn_map)
         // .add_systems(Startup, )
@@ -48,8 +48,11 @@ impl Plugin for Catan {
         // .add_systems(Update, mouse_motion)
         // .add_systems(Startup, spawn_circle)
         .add_systems(Startup, spawn_circ_bevy)
-
         // .add_systems(Startup, spawn_3d_quad)
-        .add_systems(Update, non_rotating_camera_tile_collision);
+        .add_systems(Update, non_rotating_camera_tile_collision)
+        //
+        // .add_plugin(LogDiagnosticsPlugin::default())
+        // .add_plugin(FrameTimeDiagnosticsPlugin::default())
+        ;
     }
 }

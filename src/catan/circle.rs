@@ -56,6 +56,18 @@ pub fn spawn_3d_quad(
     ));
 }
 
+/// Returns an array with length 3 * num_of_edges \
+/// that represents the order in which the edges of a \
+/// mesh should be constructed.
+///
+/// # Examples
+///
+/// use bevy::prelude::*;
+///
+/// let indices : Indices = build_circle_indices(4);
+///
+/// assert_eq!(indices.len(), 0);
+///
 fn build_circle_indices(num_of_edges: u32) -> Indices {
     let mut result: Vec<u32> = Vec::with_capacity(3 * num_of_edges as usize);
 
@@ -73,8 +85,7 @@ pub fn spawn_circ_bevy(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
-    let circ = Circle::new(1.0);
-
+    let circ = Circle::new(0.5);
     let circ_mesh: Mesh = circ.into();
 
     commands.spawn((
