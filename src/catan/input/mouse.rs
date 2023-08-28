@@ -1,12 +1,12 @@
 use bevy::{prelude::*, window::PrimaryWindow};
 
-use crate::catan::world::hex_tile::HexWorldTile;
+use crate::catan::world::land_tile::LandTile;
 
 // TODO there can be more then one CursorMoved event per frame
 // TODO I don't think it's necessary to do the calculation, more then once per frame
 // we're not going for shooter precision here
 pub fn _non_rotating_camera_tile_collision(
-    mut tile_query: Query<(&mut Transform, &HexWorldTile)>,
+    mut tile_query: Query<(&mut Transform, &LandTile)>,
     mut cursor_moved_events: EventReader<CursorMoved>,
     window_query: Query<&Window, With<PrimaryWindow>>,
 ) {

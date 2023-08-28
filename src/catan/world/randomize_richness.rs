@@ -1,9 +1,9 @@
 use bevy::prelude::*;
 use rand::random;
 
-use super::hex_tile::HexWorldTile;
+use super::land_tile::LandTile;
 
-pub fn _spawn_tile_richness_text(mut _commands: Commands, tile_query: Query<&HexWorldTile>) {
+pub fn _spawn_tile_richness_text(mut _commands: Commands, tile_query: Query<&LandTile>) {
     let tile_iter = tile_query.iter();
 
     for tile_ent in tile_iter {

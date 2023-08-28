@@ -10,10 +10,11 @@ use bevy_mod_picking::{
 use crate::catan::cubic_coords::cube_coordinates::CubCoord;
 
 use super::{
-    hex_tile::{build_tile_mesh, HexWorldTile, NUMBER_OF_TILES},
+    land_tile::{build_tile_mesh, LandTile, NUMBER_OF_TILES},
     randomize_richness::build_random_tile_richness_array,
     randomize_tiles::build_random_tile_type_array,
     tile_type::TileType,
+    water_tile::WaterTile,
 };
 
 pub fn spawn_map(
@@ -39,7 +40,7 @@ pub fn spawn_map(
             let mesh: Handle<Mesh> = meshes.add(build_tile_mesh(PI / 6.));
 
             let (prb_bundle, component) =
-                HexWorldTile::build(cub_coord, material, mesh, tile_type, tile_richness);
+                LandTile::build(cub_coord, material, mesh, tile_type, tile_richness);
 
             commands.spawn((
                 prb_bundle,
@@ -64,7 +65,7 @@ pub fn spawn_map(
 
             let mesh: Handle<Mesh> = meshes.add(build_tile_mesh(PI / 6.));
 
-            let ent = HexWorldTile::build(cub_coord, material, mesh, TileType::WATER, 0);
+            let ent = WaterTile::build(cub_coord, material, mesh, TileType::WATER, 0);
 
             commands.spawn(ent);
         }
