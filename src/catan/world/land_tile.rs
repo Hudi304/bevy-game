@@ -10,7 +10,7 @@ use super::tile_type::TileType;
 pub const TILE_RADIUS: f32 = 1.0;
 pub const NUMBER_OF_TILES: usize = 1 + 6 + 12; // 19 default tiles
 
-#[derive(Component)]
+#[derive(Component, Debug, Clone)]
 pub struct LandTile {
     pub cub_coord: CubCoord,
     pub cart_coord: Vec3,
