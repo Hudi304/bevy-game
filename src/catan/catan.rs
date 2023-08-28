@@ -8,7 +8,9 @@ use bevy_mod_picking::DefaultPickingPlugins;
 use super::{
     orbit_camera::{spawn_orbit_camera, update_camera_rotation},
     polygon::circle::spawn_circ_bevy,
-    world::{city_tile::spawn_city_placer_mesh, spawn_map::spawn_map},
+    world::{
+        city_tile::spawn_city_placer_mesh, road_tile::spawn_road_placer_mesh, spawn_map::spawn_map,
+    },
 };
 
 pub struct CatanPlugin;
@@ -41,6 +43,7 @@ impl Plugin for CatanPlugin {
             .add_systems(Startup, spawn_map)
             // .add_systems(Startup, spawn_circ_bevy)
             .add_systems(Startup, spawn_city_placer_mesh)
+            .add_systems(Startup, spawn_road_placer_mesh)
             // UPDATE
             .add_systems(Update, update_camera_rotation);
 

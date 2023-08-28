@@ -60,8 +60,8 @@ fn city_x((q, r, _): (f32, f32, f32), a: f32) -> f32 {
     return a * sqrt_3 / 2. * (q + r);
 }
 
-fn city_y((q, r, _): (f32, f32, f32), _: f32) -> f32 {
-    return (r - q) / 2.;
+fn city_y((q, r, _): (f32, f32, f32), a: f32) -> f32 {
+    return (r - q) / 2. * a;
 }
 
 fn city_cart((q, r, s): (f32, f32, f32), a: f32) -> (f32, f32) {
