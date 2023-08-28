@@ -1,8 +1,8 @@
+use std::ops::Range;
+
 use bevy::prelude::{shape::Circle, *};
 
-use crate::catan::cubic_coords::cube_coordinates::CubCoord;
-
-use super::spawn_map::build_cub_coord_hex_gird;
+use crate::catan::{cubic_coords::cube_coordinates::CubCoord, utils::vec::i32_tup_to_f32_tup};
 
 #[derive(Component)]
 pub struct CityTile {}
@@ -18,7 +18,16 @@ pub fn spawn_city_placer_mesh(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
-    let cub_coords_arr: Vec<CubCoord> = build_cub_coord_hex_gird(2);
+    let cub_coords_arr: Vec<CubCoord> = build_city_hex_grid(5);
+
+    let color_arr = vec![
+        Color::WHITE,
+        Color::PINK,
+        Color::ANTIQUE_WHITE,
+        Color::YELLOW,
+        Color::PURPLE,
+        Color::WHITE,
+    ];
 
     let circ = Circle::new(0.1);
 
@@ -27,11 +36,18 @@ pub fn spawn_city_placer_mesh(
 
         cart_coord.z = 0.1;
 
+        let cub_f32_tup = i32_tup_to_f32_tup((cub_coord.q, cub_coord.r, cub_coord.s));
+        let city_cart = city_cart(cub_f32_tup, 1.);
+
         commands.spawn((
             PbrBundle {
                 mesh: meshes.add(circ.into()),
-                material: materials.add(Color::PURPLE.into()),
-                transform: Transform::from_translation(cart_coord),
+                material: materials.add(color_arr[(cub_coord.ring) as usize].into()),
+                transform: Transform::from_translation(Vec3 {
+                    x: city_cart.0,
+                    y: city_cart.1,
+                    z: 0.1,
+                }),
                 ..default()
             },
             CityTile {},
@@ -39,13 +55,12 @@ pub fn spawn_city_placer_mesh(
     }
 }
 
-fn city_x((q, r, s): (f32, f32, f32), a: f32) -> f32 {
+fn city_x((q, r, _): (f32, f32, f32), a: f32) -> f32 {
     let sqrt_3 = 3_f32.sqrt();
     return a * sqrt_3 / 2. * (q + r);
 }
 
-fn city_y((q, r, s): (f32, f32, f32), a: f32) -> f32 {
-    let sqrt_3 = 3_f32.sqrt();
+fn city_y((q, r, _): (f32, f32, f32), _: f32) -> f32 {
     return (r - q) / 2.;
 }
 
@@ -54,6 +69,71 @@ fn city_cart((q, r, s): (f32, f32, f32), a: f32) -> (f32, f32) {
     let y = city_y((q, r, s), a);
 
     return (x, y);
+}
+
+pub fn build_city_hex_grid(radius: i32) -> Vec<CubCoord> {
+    let mut hex_arr = vec![];
+    let slice: Range<i32> = -radius..radius + 1;
+    // let slice: Vec<i32> = slice.into_iter().map(|i| i * 2 + 1).collect();
+
+    // find a better way to do this
+    for q in slice.clone() {
+        for r in slice.clone() {
+            let s: i32 = 0 - q - r;
+
+            let sum = q.abs() + r.abs() + s.abs();
+
+            if s.abs() > radius {
+                continue;
+            }
+
+            if q == 0 && r == 0 && s == 0 {
+                continue;
+            }
+
+            if sum / 2 == 2 {
+                if q == r || s == r || q == s {
+                    continue;
+                }
+            }
+
+            if sum / 2 == 3 {
+                if q.abs() == r.abs() || s.abs() == r.abs() || q.abs() == s.abs() {
+                    continue;
+                }
+            }
+
+            if sum / 2 == 4 {
+                let q = q.abs();
+                let r = r.abs();
+                let s = s.abs();
+
+                if (q, r, s) == (4, 2, 2) || (q, r, s) == (2, 4, 2) || (q, r, s) == (2, 2, 4) {
+                    continue;
+                }
+            }
+
+            if sum / 2 == 5 {
+                let q = q.abs();
+                let r = r.abs();
+                let s = s.abs();
+
+                if (q, r, s) != (5, 3, 2)
+                    && (q, r, s) != (5, 2, 3)
+                    && (q, r, s) != (2, 3, 5)
+                    && (q, r, s) != (2, 5, 3)
+                    && (q, r, s) != (3, 2, 5)
+                    && (q, r, s) != (3, 5, 2)
+                {
+                    continue;
+                }
+            }
+
+            hex_arr.push(CubCoord::from_tuple((q, r, s)));
+        }
+    }
+
+    return hex_arr;
 }
 
 #[cfg(test)]
