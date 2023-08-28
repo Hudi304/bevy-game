@@ -1,9 +1,12 @@
 use std::{f32::consts::PI, ops::Range};
 
-use bevy::prelude::*;
+use bevy::prelude::{
+    shape::{Circle, Quad},
+    *,
+};
 
 use bevy_mod_picking::{
-    prelude::{Click, On, Out, Over, Pointer, PointerButton, RaycastPickTarget},
+    prelude::{On, Out, Over, Pointer, RaycastPickTarget},
     PickableBundle,
 };
 
@@ -23,6 +26,8 @@ pub fn spawn_map(
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
     // let h = 3_f32.sqrt() / 2. * 1.01;
+
+    let offset_angle = PI / 6.;
     let cub_coords_arr: Vec<CubCoord> = build_cub_coord_hex_gird(7);
 
     let mut i = 0;
@@ -37,10 +42,60 @@ pub fn spawn_map(
 
             let material = materials.add(tile_type.into_color().into());
 
-            let mesh: Handle<Mesh> = meshes.add(build_tile_mesh(PI / 6.));
+            let mesh: Handle<Mesh> = meshes.add(build_tile_mesh(offset_angle));
 
-            let (prb_bundle, component) =
-                LandTile::build(cub_coord, material, mesh, tile_type, tile_richness);
+            let (prb_bundle, component) = LandTile::build(
+                cub_coord,
+                material,
+                mesh,
+                tile_type,
+                tile_richness,
+                offset_angle,
+            );
+
+            let circ = Circle::new(0.2);
+
+            // for vert in component.edges.iter() {
+            //     println!("{:.2},{:.2}", vert.x, vert.y);
+            // }
+
+            for vertex in component.vertices.iter() {
+                commands.spawn(PbrBundle {
+                    mesh: meshes.add(circ.into()),
+                    material: materials.add(Color::WHITE.into()),
+                    transform: Transform::from_translation(Vec3 {
+                        x: vertex.x,
+                        y: vertex.y,
+                        z: 0.15,
+                    }),
+                    ..default()
+                });
+            }
+
+            let quad = Quad::new(Vec2 { x: 0.15, y: 0.6 });
+
+            let mut angle = PI / 3.;
+
+            for vertex in component.edges.iter() {
+                commands.spawn(PbrBundle {
+                    mesh: meshes.add(quad.into()),
+                    material: materials.add(Color::WHITE.into()),
+                    transform: Transform::from_translation(Vec3 {
+                        x: vertex.x,
+                        y: vertex.y,
+                        z: 0.15,
+                    })
+                    .with_rotation(Quat::from_euler(
+                        EulerRot::XYZ,
+                        0.0,
+                        0.0,
+                        angle,
+                    )),
+                    ..default()
+                });
+
+                angle += PI / 3.;
+            }
 
             commands.spawn((
                 prb_bundle,
@@ -63,7 +118,7 @@ pub fn spawn_map(
         } else {
             let material = materials.add(Color::BLUE.into());
 
-            let mesh: Handle<Mesh> = meshes.add(build_tile_mesh(PI / 6.));
+            let mesh: Handle<Mesh> = meshes.add(build_tile_mesh(offset_angle));
 
             let ent = WaterTile::build(cub_coord, material, mesh, TileType::WATER, 0);
 

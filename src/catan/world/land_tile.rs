@@ -1,13 +1,10 @@
 use bevy::prelude::*;
 
-use std::sync::Arc;
-
 use crate::{
     catan::cubic_coords::cube_coordinates::CubCoord,
-    hex::polygon::{build_polygon_mesh, get_polygon_vert_with_center},
+    hex::polygon::{build_polygon_mesh, get_hex_vertices, get_polygon_vert_with_center},
 };
 
-use super::city::City;
 use super::tile_type::TileType;
 
 pub const TILE_RADIUS: f32 = 1.0;
@@ -19,11 +16,12 @@ pub struct LandTile {
     pub cart_coord: Vec3,
     pub tile_type: TileType,
     pub richness: u8,
-    // vertices: [Vec3; 6],
+    pub vertices: Vec<Vec3>,
+    pub edges: Vec<Vec3>,
     // adjacent_tiles: [Box<HexWorldTile>; 6],
     // edges / roads -> 6
     // towns -> 6
-    pub adjacent_cities: [Option<Arc<City>>; 6],
+    // pub adjacent_cities: [Option<Arc<City>>; 6],
 }
 
 impl LandTile {
@@ -34,25 +32,45 @@ impl LandTile {
         mesh: Handle<Mesh>,
         tile_type: TileType,
         richness: u8,
+        offset_angle: f32,
     ) -> (PbrBundle, LandTile) {
         // let h = 3_f32.sqrt() * 1.01;
         let h = TILE_RADIUS * 3_f32.sqrt();
+        let center_cartesian_coord = cub_coord.to_cartesian_vec3(h);
 
-        let cart_coord = cub_coord.to_cartesian_vec3(h);
+        let vertices: Vec<Vec3> = get_hex_vertices(TILE_RADIUS, offset_angle)
+            .iter()
+            .map(|vert| vert.clone() + center_cartesian_coord)
+            .collect();
+
+        let mut edges: Vec<Vec3> = Vec::with_capacity(6);
+
+        for i in 0..6 {
+            if i == 5 {
+                let edge_center = (vertices[0] + vertices[5]) / 2.;
+                edges.push(edge_center);
+                continue;
+            }
+
+            let edge_center = (vertices[i] + vertices[i + 1]) / 2.;
+            edges.push(edge_center);
+        }
 
         return (
             PbrBundle {
                 mesh,
                 material,
-                transform: Transform::from_translation(cart_coord),
+                transform: Transform::from_translation(center_cartesian_coord),
                 ..default()
             },
             LandTile {
                 cub_coord,
-                cart_coord,
+                cart_coord: center_cartesian_coord,
                 tile_type,
                 richness,
-                adjacent_cities: [None, None, None, None, None, None],
+                vertices,
+                edges,
+                // adjacent_cities: [None, None, None, None, None, None],
             },
         );
     }
