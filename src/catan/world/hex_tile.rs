@@ -1,6 +1,9 @@
 use bevy::prelude::*;
 
-use crate::{catan::cubic_coords::cube_coordinates::CubCoord, hex::polygon::{get_polygon_vert_with_center, build_polygon_mesh}};
+use crate::{
+    catan::cubic_coords::cube_coordinates::CubCoord,
+    hex::polygon::{build_polygon_mesh, get_polygon_vert_with_center},
+};
 
 use super::tile_type::TileType;
 
@@ -28,7 +31,9 @@ impl HexWorldTile {
         tile_type: TileType,
         richness: u8,
     ) -> (PbrBundle, HexWorldTile) {
-        let h = 3_f32.sqrt() / 2. * 1.01;
+        // let h = 3_f32.sqrt() * 1.01;
+        let h = TILE_RADIUS * 3_f32.sqrt();
+
         let cart_coord = cub_coord.to_cartesian_vec3(h);
 
         return (

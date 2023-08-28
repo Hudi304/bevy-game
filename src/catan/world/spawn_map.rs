@@ -45,16 +45,6 @@ pub fn spawn_map(
                 prb_bundle,
                 component,
                 PickableBundle::default(),
-                On::<Pointer<Click>>::target_commands_mut(|click, target_commands| {
-                    if click.target != click.listener() && click.button == PointerButton::Secondary
-                    {
-                        println!("in if");
-
-                        target_commands.despawn();
-                    }
-
-                    println!("outside if");
-                }),
                 On::<Pointer<Over>>::target_component_mut::<Transform>(|_, transform| {
                     let mut old_translation = transform.translation;
                     old_translation.z = 0.2;
@@ -81,7 +71,7 @@ pub fn spawn_map(
     }
 }
 
-fn build_cub_coord_hex_gird(radius: i32) -> Vec<CubCoord> {
+pub fn build_cub_coord_hex_gird(radius: i32) -> Vec<CubCoord> {
     let mut hex_arr = vec![];
     let slice: Range<i32> = -radius..radius + 1;
 

@@ -1,15 +1,14 @@
-use bevy::{prelude::*, sprite::MaterialMesh2dBundle, window::WindowResolution};
-use bevy_mod_picking::{
-    debug::DebugPickingPlugin,
-    low_latency_window_plugin,
-    prelude::{RaycastPickCamera, RaycastPickTarget},
-    DefaultPickingPlugins, PickableBundle,
+use bevy::{
+    diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin},
+    prelude::*,
+    window::WindowResolution,
 };
+use bevy_mod_picking::DefaultPickingPlugins;
 
 use super::{
     orbit_camera::{spawn_orbit_camera, update_camera_rotation},
     polygon::circle::spawn_circ_bevy,
-    world::spawn_map::spawn_map,
+    world::{city_tile::spawn_city_placer_mesh, spawn_map::spawn_map},
 };
 
 pub struct CatanPlugin;
@@ -28,6 +27,9 @@ impl Plugin for CatanPlugin {
         });
 
         app
+            // DIAGNOSTICS
+            .add_plugins(LogDiagnosticsPlugin::default())
+            .add_plugins(FrameTimeDiagnosticsPlugin::default())
             // PLUGINS
             .add_plugins(default_plugins)
             .add_plugins(DefaultPickingPlugins)
@@ -37,56 +39,11 @@ impl Plugin for CatanPlugin {
             // STARTUP
             .add_systems(Startup, spawn_orbit_camera)
             .add_systems(Startup, spawn_map)
-            .add_systems(Startup, spawn_circ_bevy)
+            // .add_systems(Startup, spawn_circ_bevy)
+            .add_systems(Startup, spawn_city_placer_mesh)
             // UPDATE
             .add_systems(Update, update_camera_rotation);
-
-        // app.add_plugins(DefaultPlugins.set(low_latency_window_plugin()))
-        //     .add_plugins(DefaultPickingPlugins)
-        //     .add_systems(Startup, setup);
 
         return ();
     }
 }
-
-// Spawn a simple scene, like bevy's 3d_scene example.
-// fn setup(
-//     mut commands: Commands,
-//     mut meshes: ResMut<Assets<Mesh>>,
-//     mut materials: ResMut<Assets<StandardMaterial>>,
-// ) {
-//     commands.spawn((
-//         PbrBundle {
-//             mesh: meshes.add(Mesh::from(shape::Plane::from_size(5.0))),
-//             material: materials.add(Color::rgb(0.3, 0.5, 0.3).into()),
-//             ..default()
-//         },
-//         PickableBundle::default(), // Adds selection, highlighting, and the `Pickable` override.
-//         RaycastPickTarget::default(),
-//     ));
-//     commands.spawn((
-//         PbrBundle {
-//             mesh: meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
-//             material: materials.add(Color::rgb(0.8, 0.7, 0.6).into()),
-//             transform: Transform::from_xyz(0.0, 0.5, 0.0),
-//             ..default()
-//         },
-//         RaycastPickTarget::default(),
-//     ));
-//     commands.spawn(PointLightBundle {
-//         point_light: PointLight {
-//             intensity: 1500.0,
-//             shadows_enabled: true,
-//             ..default()
-//         },
-//         transform: Transform::from_xyz(4.0, 8.0, -4.0),
-//         ..default()
-//     });
-//     commands.spawn((
-//         Camera3dBundle {
-//             transform: Transform::from_xyz(3.0, 3.0, 3.0).looking_at(Vec3::ZERO, Vec3::Y),
-//             ..default()
-//         },
-//         // RaycastPickCamera::default(),
-//     ));
-// }

@@ -67,12 +67,12 @@ impl CubCoord {
 
     /// Computes the X cartesian component.
     fn x((q, r, h): (f32, f32, f32)) -> f32 {
-        (q + (r / 2.0)) * 2.0 * h
+        (q + (r / 2.0)) * h
     }
 
     /// Computes the Y cartesian component.
     fn y((r, h): (f32, f32)) -> f32 {
         let sqrt_3_div_2 = 3_f32.sqrt() / 2.;
-        (r * sqrt_3_div_2) * 2.0 * h
+        (r * sqrt_3_div_2) * h
     }
 }
