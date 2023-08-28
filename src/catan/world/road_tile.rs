@@ -18,17 +18,17 @@ pub fn spawn_road_placer_mesh(
     let cub_coords_arr: Vec<CubCoord> = build_road_hex_grid(10);
 
     let color_arr = vec![
-        Color::WHITE,
-        Color::PINK,
+        Color::WHITE, // not visible
+        Color::WHITE, // not visible
         Color::ANTIQUE_WHITE,
-        Color::YELLOW,
         Color::PURPLE,
-        Color::WHITE,
-        Color::PINK,
+        Color::WHITE, // not visible
         Color::ANTIQUE_WHITE,
-        Color::YELLOW,
         Color::PURPLE,
-        Color::WHITE,
+        Color::ANTIQUE_WHITE,
+        Color::PURPLE,
+        Color::ANTIQUE_WHITE,
+        Color::PURPLE,
     ];
 
     let circ = Quad::new(Vec2 { x: 0.1, y: 0.2 });
