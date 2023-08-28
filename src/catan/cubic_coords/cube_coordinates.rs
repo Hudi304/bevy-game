@@ -1,6 +1,6 @@
 use bevy::prelude::{Vec2, Vec3};
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy, Default)]
 pub struct CubCoord {
     pub q: i32,    // W/E (left to right)
     pub r: i32,    // NW/SE (up-left to down-right)
@@ -55,6 +55,32 @@ impl CubCoord {
         let z = 0.;
         Vec3::new(x, y, z)
     }
+
+    pub fn to_string(&self) -> String {
+        format!("({}, {}, {})", self.q, self.r, self.s).to_string()
+    }
+
+    pub fn get_neighbors(&self) -> [CubCoord; 6] {
+        [
+            CubCoord::new(self.q + 0, self.r - 1, self.s + 1),
+            CubCoord::new(self.q + 1, self.r - 1, self.s + 0),
+            CubCoord::new(self.q + 1, self.r + 0, self.s - 1),
+            CubCoord::new(self.q + 0, self.r + 1, self.s - 1),
+            CubCoord::new(self.q - 1, self.r + 1, self.s + 0),
+            CubCoord::new(self.q - 1, self.r + 0, self.s + 1),
+        ]
+    }
+
+    // pub fn get_neighbors(&self) -> Vec<CubCoord> {
+    //     vec![
+    //         CubCoord::new(self.q + 0, self.r - 1, self.s + 1),
+    //         CubCoord::new(self.q + 1, self.r - 1, self.s + 0),
+    //         CubCoord::new(self.q + 1, self.r + 0, self.s - 1),
+    //         CubCoord::new(self.q + 0, self.r + 1, self.s - 1),
+    //         CubCoord::new(self.q - 1, self.r + 1, self.s + 0),
+    //         CubCoord::new(self.q - 1, self.r + 0, self.s + 1),
+    //     ]
+    // }
 
     pub fn _to_cartesian_vec2(&self, h: f32) -> Vec2 {
         let q = self.s as f32;

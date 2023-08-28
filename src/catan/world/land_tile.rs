@@ -1,10 +1,13 @@
 use bevy::prelude::*;
 
+use std::sync::Arc;
+
 use crate::{
     catan::cubic_coords::cube_coordinates::CubCoord,
     hex::polygon::{build_polygon_mesh, get_polygon_vert_with_center},
 };
 
+use super::city::City;
 use super::tile_type::TileType;
 
 pub const TILE_RADIUS: f32 = 1.0;
@@ -20,8 +23,8 @@ pub struct LandTile {
     // adjacent_tiles: [Box<HexWorldTile>; 6],
     // edges / roads -> 6
     // towns -> 6
+    pub adjacent_cities: [Option<Arc<City>>; 6],
 }
-
 
 impl LandTile {
     /// Builds a PrbBundle from a hex center and translates it.
@@ -49,6 +52,7 @@ impl LandTile {
                 cart_coord,
                 tile_type,
                 richness,
+                adjacent_cities: [None, None, None, None, None, None],
             },
         );
     }

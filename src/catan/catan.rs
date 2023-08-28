@@ -10,6 +10,7 @@ use super::{
     polygon::circle::spawn_circ_bevy,
     world::{
         city_tile::spawn_city_placer_mesh, road_tile::spawn_road_placer_mesh, spawn_map::spawn_map,
+        spawn_map_2::spawn_map_2,
     },
 };
 
@@ -40,10 +41,11 @@ impl Plugin for CatanPlugin {
             .insert_resource(FixedTime::new_from_secs(1.0 / 60.0))
             // STARTUP
             .add_systems(Startup, spawn_orbit_camera)
-            .add_systems(Startup, spawn_map)
+            // .add_systems(Startup, spawn_map)
+            .add_systems(Startup, spawn_map_2)
             // .add_systems(Startup, spawn_circ_bevy)
-            .add_systems(Startup, spawn_city_placer_mesh)
-            .add_systems(Startup, spawn_road_placer_mesh)
+            // .add_systems(Startup, spawn_city_placer_mesh)
+            // .add_systems(Startup, spawn_road_placer_mesh)
             // UPDATE
             .add_systems(Update, update_camera_rotation);
 
