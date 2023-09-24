@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 use bevy_tutorial::exit_game::GameOverEvent;
-use catan::catan::CatanPlugin;
+use catan::main_catan::CatanPlugin;
 
 mod bevy_tutorial;
 mod hex;

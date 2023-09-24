@@ -5,7 +5,7 @@ use bevy::prelude::{
     *,
 };
 
-use crate::catan::{cubic_coords::cube_coordinates::CubCoord, utils::vec::i32_tup_to_f32_tup};
+use crate::catan::{cubic_coords::cube_coordinates::CubicCoord, utils::vec::i32_tup_to_f32_tup};
 
 #[derive(Component)]
 pub struct RoadTile {}
@@ -15,7 +15,7 @@ pub fn spawn_road_placer_mesh(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
-    let cub_coords_arr: Vec<CubCoord> = build_road_hex_grid(10);
+    let cub_coords_arr: Vec<CubicCoord> = build_road_hex_grid(10);
 
     let color_arr = vec![
         Color::WHITE, // not visible
@@ -73,7 +73,7 @@ fn road_cart((q, r, s): (f32, f32, f32), a: f32) -> (f32, f32) {
     return (x, y);
 }
 
-pub fn build_road_hex_grid(radius: i32) -> Vec<CubCoord> {
+pub fn build_road_hex_grid(radius: i32) -> Vec<CubicCoord> {
     let mut hex_arr = vec![];
     let slice: Range<i32> = -radius..radius + 1;
     // let slice: Vec<i32> = slice.into_iter().map(|i| i * 2 + 1).collect();
@@ -167,7 +167,7 @@ pub fn build_road_hex_grid(radius: i32) -> Vec<CubCoord> {
                 continue;
             }
 
-            hex_arr.push(CubCoord::from_tuple((q, r, s)));
+            hex_arr.push(CubicCoord::from_tuple((q, r, s)));
         }
     }
 

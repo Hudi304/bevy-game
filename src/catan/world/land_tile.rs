@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
 use crate::{
-    catan::cubic_coords::cube_coordinates::CubCoord,
+    catan::cubic_coords::cube_coordinates::CubicCoord,
     hex::polygon::{build_polygon_mesh, get_hex_vertices, get_polygon_vert_with_center},
 };
 
@@ -12,7 +12,7 @@ pub const NUMBER_OF_TILES: usize = 1 + 6 + 12; // 19 default tiles
 
 #[derive(Component, Debug, Clone)]
 pub struct LandTile {
-    pub cub_coord: CubCoord,
+    pub cub_coord: CubicCoord,
     pub cart_coord: Vec3,
     pub tile_type: TileType,
     pub richness: u8,
@@ -27,7 +27,7 @@ pub struct LandTile {
 impl LandTile {
     /// Builds a PrbBundle from a hex center and translates it.
     pub fn build(
-        cub_coord: CubCoord,
+        cub_coord: CubicCoord,
         material: Handle<StandardMaterial>,
         mesh: Handle<Mesh>,
         tile_type: TileType,
@@ -47,7 +47,7 @@ impl LandTile {
 
         for i in 0..6 {
             if i == 5 {
-                let edge_center = (vertices[0] + vertices[5]) / 2.;
+                let edge_center = (vertices[0] + vertices[5]) / 2.0;
                 edges.push(edge_center);
                 continue;
             }

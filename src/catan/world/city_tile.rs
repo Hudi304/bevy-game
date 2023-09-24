@@ -2,7 +2,7 @@ use std::ops::Range;
 
 use bevy::prelude::{shape::Circle, *};
 
-use crate::catan::{cubic_coords::cube_coordinates::CubCoord, utils::vec::i32_tup_to_f32_tup};
+use crate::catan::{cubic_coords::cube_coordinates::CubicCoord, utils::vec::i32_tup_to_f32_tup};
 
 #[derive(Component)]
 pub struct CityTile {}
@@ -18,7 +18,7 @@ pub fn spawn_city_placer_mesh(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
-    let cub_coords_arr: Vec<CubCoord> = build_city_hex_grid(5);
+    let cub_coords_arr: Vec<CubicCoord> = build_city_hex_grid(5);
 
     let color_arr = vec![
         Color::WHITE,
@@ -71,7 +71,8 @@ fn city_cart((q, r, s): (f32, f32, f32), a: f32) -> (f32, f32) {
     return (x, y);
 }
 
-pub fn build_city_hex_grid(radius: i32) -> Vec<CubCoord> {
+// TODO I hate this, find a better way of doing it
+pub fn build_city_hex_grid(radius: i32) -> Vec<CubicCoord> {
     let mut hex_arr = vec![];
     let slice: Range<i32> = -radius..radius + 1;
     // let slice: Vec<i32> = slice.into_iter().map(|i| i * 2 + 1).collect();
@@ -129,7 +130,7 @@ pub fn build_city_hex_grid(radius: i32) -> Vec<CubCoord> {
                 }
             }
 
-            hex_arr.push(CubCoord::from_tuple((q, r, s)));
+            hex_arr.push(CubicCoord::from_tuple((q, r, s)));
         }
     }
 

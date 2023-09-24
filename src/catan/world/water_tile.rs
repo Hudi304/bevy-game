@@ -1,11 +1,11 @@
 use bevy::prelude::*;
 
-use crate::catan::cubic_coords::cube_coordinates::CubCoord;
+use crate::catan::cubic_coords::cube_coordinates::CubicCoord;
 
 use super::{land_tile::TILE_RADIUS, tile_type::TileType};
 #[derive(Component)]
 pub struct WaterTile {
-    pub cub_coord: CubCoord,
+    pub cub_coord: CubicCoord,
     pub cart_coord: Vec3,
     pub tile_type: TileType,
     pub richness: u8,
@@ -14,7 +14,7 @@ pub struct WaterTile {
 impl WaterTile {
     /// Builds a PrbBundle from a hex center and translates it.
     pub fn build(
-        cub_coord: CubCoord,
+        cub_coord: CubicCoord,
         material: Handle<StandardMaterial>,
         mesh: Handle<Mesh>,
         tile_type: TileType,

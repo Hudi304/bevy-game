@@ -1,23 +1,13 @@
-use std::{
-    cmp::Ordering,
-    f32::{consts::PI, EPSILON},
-    ops::Range,
-};
+use std::{ cmp::Ordering, f32::{ consts::PI, EPSILON }, ops::Range };
 
-use bevy::prelude::{
-    shape::{Circle, Quad},
-    *,
-};
+use bevy::prelude::{ shape::{ Circle, Quad }, * };
 
-use bevy_mod_picking::{
-    prelude::{On, Out, Over, Pointer, RaycastPickTarget},
-    PickableBundle,
-};
+use bevy_mod_picking::{ prelude::{ On, Out, Over, Pointer, RaycastPickTarget }, PickableBundle };
 
-use crate::catan::cubic_coords::cube_coordinates::CubCoord;
+use crate::catan::cubic_coords::cube_coordinates::CubicCoord;
 
 use super::{
-    land_tile::{build_tile_mesh, LandTile, NUMBER_OF_TILES},
+    land_tile::{ build_tile_mesh, LandTile, NUMBER_OF_TILES },
     randomize_richness::build_random_tile_richness_array,
     randomize_tiles::build_random_tile_type_array,
     tile_type::TileType,
@@ -27,12 +17,12 @@ use super::{
 pub fn spawn_land_tiles(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<StandardMaterial>>,
+    mut materials: ResMut<Assets<StandardMaterial>>
 ) {
     // let h = 3_f32.sqrt() / 2. * 1.01;
 
-    let offset_angle = PI / 6.;
-    let cub_coords_arr: Vec<CubCoord> = build_cub_coord_hex_gird(7);
+    let offset_angle = PI / 6.0;
+    let cub_coords_arr: Vec<CubicCoord> = build_cub_coord_hex_gird(7);
 
     let mut i = 0;
     let tile_type_arr = build_random_tile_type_array(NUMBER_OF_TILES);
@@ -56,47 +46,47 @@ pub fn spawn_land_tiles(
                 mesh,
                 tile_type,
                 tile_richness,
-                offset_angle,
+                offset_angle
             );
 
             tile_arr.push(component.clone());
 
-            // let circ = Circle::new(0.2);
-            // for vertex in component.vertices.iter() {
-            //     commands.spawn(PbrBundle {
-            //         mesh: meshes.add(circ.into()),
-            //         material: materials.add(Color::WHITE.into()),
-            //         transform: Transform::from_translation(Vec3 {
-            //             x: vertex.x,
-            //             y: vertex.y,
-            //             z: 0.15,
-            //         }),
-            //         ..default()
-            //     });
-            // }
+            let circ = Circle::new(0.2);
+            for vertex in component.vertices.iter() {
+                commands.spawn(PbrBundle {
+                    mesh: meshes.add(circ.into()),
+                    material: materials.add(Color::WHITE.into()),
+                    transform: Transform::from_translation(Vec3 {
+                        x: vertex.x,
+                        y: vertex.y,
+                        z: 0.15,
+                    }),
+                    ..default()
+                });
+            }
 
-            // let quad = Quad::new(Vec2 { x: 0.15, y: 0.6 });
-            // let mut angle = PI / 3.;
-            // for vertex in component.edges.iter() {
-            //     commands.spawn(PbrBundle {
-            //         mesh: meshes.add(quad.into()),
-            //         material: materials.add(Color::WHITE.into()),
-            //         transform: Transform::from_translation(Vec3 {
-            //             x: vertex.x,
-            //             y: vertex.y,
-            //             z: 0.15,
-            //         })
-            //         .with_rotation(Quat::from_euler(
-            //             EulerRot::XYZ,
-            //             0.0,
-            //             0.0,
-            //             angle,
-            //         )),
-            //         ..default()
-            //     });
+            let quad = Quad::new(Vec2 { x: 0.15, y: 0.6 });
+            let mut angle = PI / 3.;
+            for vertex in component.edges.iter() {
+                commands.spawn(PbrBundle {
+                    mesh: meshes.add(quad.into()),
+                    material: materials.add(Color::WHITE.into()),
+                    transform: Transform::from_translation(Vec3 {
+                        x: vertex.x,
+                        y: vertex.y,
+                        z: 0.15,
+                    })
+                    .with_rotation(Quat::from_euler(
+                        EulerRot::XYZ,
+                        0.0,
+                        0.0,
+                        angle,
+                    )),
+                    ..default()
+                });
 
-            //     angle += PI / 3.;
-            // }
+                angle += PI / 3.;
+            }
 
             commands.spawn((
                 prb_bundle,
@@ -105,12 +95,12 @@ pub fn spawn_land_tiles(
                 On::<Pointer<Over>>::target_component_mut::<Transform>(|_, transform| {
                     let mut old_translation = transform.translation;
                     old_translation.z = 0.2;
-                    transform.translation = old_translation
+                    transform.translation = old_translation;
                 }),
                 On::<Pointer<Out>>::target_component_mut::<Transform>(|_, transform| {
                     let mut old_translation = transform.translation;
                     old_translation.z = 0.0;
-                    transform.translation = old_translation
+                    transform.translation = old_translation;
                 }),
                 RaycastPickTarget::default(),
             ));
@@ -192,7 +182,7 @@ fn print_pos_vec(arr: Vec<&Vec3>) {
     }
 }
 
-pub fn build_cub_coord_hex_gird(radius: i32) -> Vec<CubCoord> {
+pub fn build_cub_coord_hex_gird(radius: i32) -> Vec<CubicCoord> {
     let mut hex_arr = vec![];
     let slice: Range<i32> = -radius..radius + 1;
 
@@ -204,7 +194,7 @@ pub fn build_cub_coord_hex_gird(radius: i32) -> Vec<CubCoord> {
                 continue;
             }
 
-            hex_arr.push(CubCoord::from_tuple((q, r, s)));
+            hex_arr.push(CubicCoord::from_tuple((q, r, s)));
         }
     }
 

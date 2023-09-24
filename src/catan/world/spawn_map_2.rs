@@ -2,7 +2,7 @@ use std::f32::consts::PI;
 
 use bevy::prelude::*;
 
-use crate::catan::{cubic_coords::cube_coordinates::CubCoord, world::city::City};
+use crate::catan::{cubic_coords::cube_coordinates::CubicCoord, world::city::City};
 
 use super::land_tile::{build_tile_mesh, LandTile};
 

@@ -1,7 +1,7 @@
 use bevy::prelude::{Vec2, Vec3};
 
 #[derive(Debug, Clone, Copy, Default)]
-pub struct CubCoord {
+pub struct CubicCoord {
     pub q: i32,    // W/E (left to right)
     pub r: i32,    // NW/SE (up-left to down-right)
     pub s: i32,    // NE/SW (up-right to down-left)
@@ -19,39 +19,39 @@ pub struct CubCoord {
 // let xy = |v: Vec3| Vec3::new(1.01 * x(v), 1.01 * y(v), 0.0);
 // let mut hex_arr = vec![];
 
-impl CubCoord {
-    pub fn new(q: i32, r: i32, s: i32) -> CubCoord {
+impl CubicCoord {
+    pub fn new(q: i32, r: i32, s: i32) -> CubicCoord {
         let ring = (q.abs() + r.abs() + s.abs()) / 2;
-        CubCoord { q, r, s, ring }
+        CubicCoord { q, r, s, ring }
     }
-    pub fn _from_qrs(q: i32, r: i32, s: i32) -> CubCoord {
-        CubCoord::new(q, r, s)
+    pub fn _from_qrs(q: i32, r: i32, s: i32) -> CubicCoord {
+        CubicCoord::new(q, r, s)
     }
 
-    pub fn from_tuple((q, r, s): (i32, i32, i32)) -> CubCoord {
-        CubCoord::new(q, r, s)
+    pub fn from_tuple((q, r, s): (i32, i32, i32)) -> CubicCoord {
+        CubicCoord::new(q, r, s)
     }
     /// Rounds x,y,z into i32
-    pub fn _from_vec(vec: Vec3) -> CubCoord {
+    pub fn _from_vec(vec: Vec3) -> CubicCoord {
         let q: i32 = vec.x.round() as i32;
         let r: i32 = vec.y.round() as i32;
         let s: i32 = vec.z.round() as i32;
-        CubCoord::new(q, r, s)
+        CubicCoord::new(q, r, s)
     }
     /// Rounds arr[x,y,z] into i32
-    pub fn _from_arr(arr: [f32; 3]) -> CubCoord {
+    pub fn _from_arr(arr: [f32; 3]) -> CubicCoord {
         let q: i32 = arr[0].round() as i32;
         let r: i32 = arr[1].round() as i32;
         let s: i32 = arr[2].round() as i32;
-        CubCoord::new(q, r, s)
+        CubicCoord::new(q, r, s)
     }
 
     pub fn to_cartesian_vec3(&self, h: f32) -> Vec3 {
         let q = self.s as f32;
         let r = self.q as f32;
 
-        let x = CubCoord::x((q, r, h));
-        let y = CubCoord::y((r, h));
+        let x = CubicCoord::x((q, r, h));
+        let y = CubicCoord::y((r, h));
         let z = 0.;
         Vec3::new(x, y, z)
     }
@@ -60,14 +60,14 @@ impl CubCoord {
         format!("({}, {}, {})", self.q, self.r, self.s).to_string()
     }
 
-    pub fn get_neighbors(&self) -> [CubCoord; 6] {
+    pub fn get_neighbors(&self) -> [CubicCoord; 6] {
         [
-            CubCoord::new(self.q + 0, self.r - 1, self.s + 1),
-            CubCoord::new(self.q + 1, self.r - 1, self.s + 0),
-            CubCoord::new(self.q + 1, self.r + 0, self.s - 1),
-            CubCoord::new(self.q + 0, self.r + 1, self.s - 1),
-            CubCoord::new(self.q - 1, self.r + 1, self.s + 0),
-            CubCoord::new(self.q - 1, self.r + 0, self.s + 1),
+            CubicCoord::new(self.q + 0, self.r - 1, self.s + 1),
+            CubicCoord::new(self.q + 1, self.r - 1, self.s + 0),
+            CubicCoord::new(self.q + 1, self.r + 0, self.s - 1),
+            CubicCoord::new(self.q + 0, self.r + 1, self.s - 1),
+            CubicCoord::new(self.q - 1, self.r + 1, self.s + 0),
+            CubicCoord::new(self.q - 1, self.r + 0, self.s + 1),
         ]
     }
 
@@ -86,8 +86,8 @@ impl CubCoord {
         let q = self.s as f32;
         let r = self.q as f32;
 
-        let x = CubCoord::x((q, r, h));
-        let y = CubCoord::y((r, h));
+        let x = CubicCoord::x((q, r, h));
+        let y = CubicCoord::y((r, h));
         Vec2::new(x, y)
     }
 
