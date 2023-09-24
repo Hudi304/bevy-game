@@ -2,7 +2,7 @@ use bevy::prelude::Vec3;
 
 use crate::catan::world::{
     land_tile::LandTile,
-    vec3_utils::{ sort_positions, remove_vec3_duplicates },
+    vec3_utils::{ compare_vec3, remove_vec3_duplicates },
     spawn_tiles::TILE_EPSILON,
 };
 
@@ -14,7 +14,7 @@ pub fn get_city_positions(land_tiles: &Vec<LandTile>) -> Vec<Vec3> {
         .collect();
 
     // sorted array of hex vertices, sorted by x,y
-    all_tile_vertices.sort_by(|v1, v2| sort_positions(v1, v2, TILE_EPSILON));
+    all_tile_vertices.sort_by(|v1, v2| compare_vec3(v1, v2, TILE_EPSILON));
 
     // sorted array of hex vertices without duplicates within eps
     let unique_city_positions = remove_vec3_duplicates(&all_tile_vertices, TILE_EPSILON);
@@ -29,7 +29,7 @@ mod spawn_cities {
     use crate::{
         catan::world::{
             land_tile::TILE_RADIUS,
-            vec3_utils::{ remove_vec3_duplicates, sort_positions },
+            vec3_utils::{ remove_vec3_duplicates, compare_vec3 },
             spawn_tiles::{ build_cub_coord_hex_gird, TILE_OFFSET_ANGLE_RAD, TILE_EPSILON },
         },
         hex::polygon::get_hex_vertices,
@@ -51,7 +51,7 @@ mod spawn_cities {
             .collect();
 
         // sorted array of hex vertices, sorted by x,y
-        hex_vertices.sort_by(|v1, v2| sort_positions(v1, v2, TILE_EPSILON));
+        hex_vertices.sort_by(|v1, v2| compare_vec3(v1, v2, TILE_EPSILON));
 
         // sorted array of hex vertices without duplicates within eps
         let unique_city_positions = remove_vec3_duplicates(&hex_vertices, TILE_EPSILON);
@@ -84,7 +84,7 @@ mod spawn_cities {
         }
 
         // sorted array of hex vertices, sorted by x,y
-        all_hex_vertices.sort_by(|v1, v2| sort_positions(v1, v2, TILE_EPSILON));
+        all_hex_vertices.sort_by(|v1, v2| compare_vec3(v1, v2, TILE_EPSILON));
 
         assert_eq!(all_hex_vertices.len(), 7 * 6);
 
@@ -122,7 +122,7 @@ mod spawn_cities {
         }
 
         // sorted array of hex vertices, sorted by x,y
-        all_hex_vertices.sort_by(|v1, v2| sort_positions(v1, v2, TILE_EPSILON));
+        all_hex_vertices.sort_by(|v1, v2| compare_vec3(v1, v2, TILE_EPSILON));
 
         assert_eq!(all_hex_vertices.len(), 19 * 6);
 

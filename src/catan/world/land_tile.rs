@@ -1,3 +1,5 @@
+use std::f32::consts::PI;
+
 use bevy::prelude::*;
 
 use crate::{
@@ -21,7 +23,7 @@ pub struct LandTile {
     pub tile_type: TileType,
     pub richness: u8,
     pub vertices: Vec<Vec3>,
-    pub edges: Vec<Vec3>,
+    pub edges: Vec<(Vec3, f32)>,
     // adjacent_tiles: [Box<HexWorldTile>; 6],
     // edges / roads -> 6
     // towns -> 6
@@ -45,17 +47,20 @@ impl LandTile {
             .map(|vert| vert.clone() + center_cartesian_coord)
             .collect();
 
-        let mut edges: Vec<Vec3> = Vec::with_capacity(6);
+        let mut edges = Vec::with_capacity(6);
 
         for i in 0..6 {
             if i == 5 {
                 let edge_center = (vertices[0] + vertices[5]) / 2.0;
-                edges.push(edge_center);
+                let angle = calculate_slope(vertices[0], vertices[5]);
+                edges.push((edge_center, angle));
                 continue;
             }
 
             let edge_center = (vertices[i] + vertices[i + 1]) / 2.0;
-            edges.push(edge_center);
+            let angle = calculate_slope(vertices[i], vertices[i + 1]);
+
+            edges.push((edge_center, angle));
         }
 
         return (
@@ -86,4 +91,15 @@ pub fn build_tile_mesh(offset_angle: f32) -> Mesh {
     let hex_tile_mesh: Mesh = build_polygon_mesh(&hex_tile_vertex_vec);
 
     return hex_tile_mesh;
+}
+
+fn calculate_slope(v1: Vec3, v2: Vec3) -> f32 {
+    // Check if the line is vertical (x2 - x1 is zero)
+    if (v2.x - v1.x).abs() < 1e-6 {
+        PI / 2.0 // The line is vertical, and the slope and angle are undefined
+    } else {
+        let slope = (v2.y - v1.y) / (v2.x - v1.x);
+        let angle_radians = slope.atan2(1.0);
+        angle_radians
+    }
 }
