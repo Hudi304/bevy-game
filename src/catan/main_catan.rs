@@ -1,16 +1,13 @@
 use bevy::{
-    diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin},
+    diagnostic::{ FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin },
     prelude::*,
     window::WindowResolution,
 };
 use bevy_mod_picking::DefaultPickingPlugins;
 
 use super::{
-    orbit_camera::{spawn_orbit_camera, update_camera_rotation},
-    world::{
-        city_tile::spawn_city_placer_mesh, road_tile::spawn_road_placer_mesh,
-        spawn_cities::spawn_cities, spawn_tiles::spawn_land_tiles,
-    },
+    orbit_camera::{ spawn_orbit_camera, update_camera_rotation },
+    world::{ road_tile::spawn_road_placer_mesh, spawn_tiles::spawn_land_tiles },
 };
 
 pub struct CatanPlugin;
