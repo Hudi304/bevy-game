@@ -12,6 +12,7 @@ use super::{
     randomize_tiles::build_random_tile_type_array,
     tile_type::TileType,
     water_tile::WaterTile,
+    vec3_cmp::sort_positions,
 };
 
 pub fn spawn_land_tiles(
@@ -21,14 +22,17 @@ pub fn spawn_land_tiles(
 ) {
     // let h = 3_f32.sqrt() / 2. * 1.01;
 
-    let offset_angle = PI / 6.0;
+    println!("spawn_land_tiles");
+
+    let offset_angle = PI / 6.0; // 30deg
     let cub_coords_arr: Vec<CubicCoord> = build_cub_coord_hex_gird(7);
+    let eps = 0.01;
 
     let mut i = 0;
     let tile_type_arr = build_random_tile_type_array(NUMBER_OF_TILES);
     let richness_arr = build_random_tile_richness_array(NUMBER_OF_TILES);
 
-    let mut tile_arr = Vec::with_capacity(NUMBER_OF_TILES);
+    let mut land_tile_arr = Vec::with_capacity(NUMBER_OF_TILES);
 
     for cub_coord in cub_coords_arr {
         // TODO refactor this so the HexWorldTile contains the material asset and the mesh asset
@@ -40,7 +44,7 @@ pub fn spawn_land_tiles(
 
             let mesh: Handle<Mesh> = meshes.add(build_tile_mesh(offset_angle));
 
-            let (prb_bundle, component) = LandTile::build(
+            let (prb_bundle, land_tile) = LandTile::build(
                 cub_coord,
                 material,
                 mesh,
@@ -49,48 +53,48 @@ pub fn spawn_land_tiles(
                 offset_angle
             );
 
-            tile_arr.push(component.clone());
+            land_tile_arr.push(land_tile.clone());
 
-            let circ = Circle::new(0.2);
-            for vertex in component.vertices.iter() {
-                commands.spawn(PbrBundle {
-                    mesh: meshes.add(circ.into()),
-                    material: materials.add(Color::WHITE.into()),
-                    transform: Transform::from_translation(Vec3 {
-                        x: vertex.x,
-                        y: vertex.y,
-                        z: 0.15,
-                    }),
-                    ..default()
-                });
-            }
+            // let circ = Circle::new(0.2);
+            // for vertex in component.vertices.iter() {
+            //     commands.spawn(PbrBundle {
+            //         mesh: meshes.add(circ.into()),
+            //         material: materials.add(Color::WHITE.into()),
+            //         transform: Transform::from_translation(Vec3 {
+            //             x: vertex.x,
+            //             y: vertex.y,
+            //             z: 0.15,
+            //         }),
+            //         ..default()
+            //     });
+            // }
 
-            let quad = Quad::new(Vec2 { x: 0.15, y: 0.6 });
-            let mut angle = PI / 3.;
-            for vertex in component.edges.iter() {
-                commands.spawn(PbrBundle {
-                    mesh: meshes.add(quad.into()),
-                    material: materials.add(Color::WHITE.into()),
-                    transform: Transform::from_translation(Vec3 {
-                        x: vertex.x,
-                        y: vertex.y,
-                        z: 0.15,
-                    })
-                    .with_rotation(Quat::from_euler(
-                        EulerRot::XYZ,
-                        0.0,
-                        0.0,
-                        angle,
-                    )),
-                    ..default()
-                });
+            // let quad = Quad::new(Vec2 { x: 0.15, y: 0.6 });
+            // let mut angle = PI / 3.;
+            // for vertex in component.edges.iter() {
+            //     commands.spawn(PbrBundle {
+            //         mesh: meshes.add(quad.into()),
+            //         material: materials.add(Color::WHITE.into()),
+            //         transform: Transform::from_translation(Vec3 {
+            //             x: vertex.x,
+            //             y: vertex.y,
+            //             z: 0.15,
+            //         })
+            //         .with_rotation(Quat::from_euler(
+            //             EulerRot::XYZ,
+            //             0.0,
+            //             0.0,
+            //             angle,
+            //         )),
+            //         ..default()
+            //     });
 
-                angle += PI / 3.;
-            }
+            //     angle += PI / 3.;
+            // }
 
             commands.spawn((
                 prb_bundle,
-                component.clone(),
+                land_tile.clone(),
                 PickableBundle::default(),
                 On::<Pointer<Over>>::target_component_mut::<Transform>(|_, transform| {
                     let mut old_translation = transform.translation;
@@ -107,78 +111,38 @@ pub fn spawn_land_tiles(
 
             i += 1;
         } else {
+            // Water tile
             let material = materials.add(Color::BLUE.into());
-
             let mesh: Handle<Mesh> = meshes.add(build_tile_mesh(offset_angle));
-
             let ent = WaterTile::build(cub_coord, material, mesh, TileType::WATER, 0);
-
             commands.spawn(ent);
         }
     }
 
-    let mut city_points: Vec<Vec3> = Vec::new();
+    let mut all_tile_vertices: Vec<Vec3> = land_tile_arr
+        .iter()
+        .flat_map(|tile| tile.vertices.iter().cloned())
+        .collect();
 
-    for tile in tile_arr {
-        for vert in tile.vertices {
-            city_points.push(vert);
-        }
-    }
-
-    let eps = 0.01;
-
-    let sort_fn = |v1: &Vec3, v2: &Vec3| {
-        if v1.x - v2.x < eps {
-            return Ordering::Less;
-        }
-
-        if v2.x - v1.x < eps {
-            return Ordering::Greater;
-        }
-
-        if v1.y - v2.y < eps {
-            return Ordering::Less;
-        }
-
-        if v2.y - v1.y < eps {
-            return Ordering::Greater;
-        }
-
-        println!("Equal x");
-        println!("  {}", v1);
-        println!("  {}", v2);
-
-        return Ordering::Equal;
-    };
     // this sort by does not work as intended
-    city_points.sort_by(sort_fn);
-    city_points.sort_by(sort_fn);
+    all_tile_vertices.sort_by(|v1, v2| sort_positions(v1, v2, eps));
+    let unique_city_positions = filter_city_positions(&all_tile_vertices, eps);
 
-    for pt in city_points.iter() {
-        println!("{:.2},{:.2}", pt.x, pt.y);
-    }
+    print_pos_vec(&unique_city_positions);
 
-    let mut city_points_iter = city_points.iter();
+    let circle = Circle::new(0.2);
 
-    let prev_el = city_points_iter.next().unwrap();
-
-    let mut single_arr = Vec::new();
-
-    for pt in city_points_iter {
-        if prev_el.x - pt.x < eps && prev_el.y - pt.y < eps {
-            single_arr.push(pt);
-        }
-    }
-
-    println!("{}", city_points.len());
-    println!("{}", single_arr.len());
-
-    // print_pos_vec(single_arr);
-}
-
-fn print_pos_vec(arr: Vec<&Vec3>) {
-    for pt in arr.iter() {
-        println!("{:.2},{:.2}", pt.x, pt.y);
+    for vertex in unique_city_positions.iter() {
+        commands.spawn(PbrBundle {
+            mesh: meshes.add(circle.into()),
+            material: materials.add(Color::WHITE.into()),
+            transform: Transform::from_translation(Vec3 {
+                x: vertex.x,
+                y: vertex.y,
+                z: 0.15,
+            }),
+            ..default()
+        });
     }
 }
 
@@ -199,4 +163,39 @@ pub fn build_cub_coord_hex_gird(radius: i32) -> Vec<CubicCoord> {
     }
 
     return hex_arr;
+}
+
+// TODO test this with 1 hex, 7 hex and 19 hex
+fn filter_city_positions(all_filtered_vertices: &Vec<Vec3>, eps: f32) -> Vec<Vec3> {
+    let mut city_points_iter = all_filtered_vertices.iter();
+    let mut prev_el = city_points_iter.next().unwrap();
+
+    let mut unique_city_positions = Vec::new();
+
+    for pt in city_points_iter {
+        let ord = sort_positions(prev_el, pt, eps);
+
+        if ord != Ordering::Equal {
+            unique_city_positions.push(pt.clone());
+        }
+
+        prev_el = pt;
+    }
+    unique_city_positions
+}
+
+fn print_pos_vec(arr: &Vec<Vec3>) {
+    for pt in arr.iter() {
+        println!("{:.2},{:.2}", pt.x, pt.y);
+    }
+}
+
+#[cfg(test)]
+mod spawn_tiles_tests {
+    use super::*;
+
+    #[test]
+    fn sort_Vec3() {
+        let v = vec![Vec3::new(1.01, 1.01, 0.0), Vec3::new(1.01, -1.01, 0.0)];
+    }
 }

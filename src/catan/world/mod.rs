@@ -9,3 +9,5 @@ pub mod spawn_map_2;
 pub mod spawn_tiles;
 pub mod tile_type;
 pub mod water_tile;
+pub mod f32_cmp;
+pub mod vec3_cmp;
