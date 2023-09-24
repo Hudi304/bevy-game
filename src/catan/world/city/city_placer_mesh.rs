@@ -1,3 +1,27 @@
+use bevy::prelude::Vec3;
+
+use crate::catan::world::{
+    land_tile::LandTile,
+    vec3_utils::{ sort_positions, remove_vec3_duplicates },
+    spawn_tiles::TILE_EPSILON,
+};
+
+pub fn get_city_positions(land_tiles: &Vec<LandTile>) -> Vec<Vec3> {
+    // All the hex vertices
+    let mut all_tile_vertices: Vec<Vec3> = land_tiles
+        .iter()
+        .flat_map(|tile| tile.vertices.iter().cloned())
+        .collect();
+
+    // sorted array of hex vertices, sorted by x,y
+    all_tile_vertices.sort_by(|v1, v2| sort_positions(v1, v2, TILE_EPSILON));
+
+    // sorted array of hex vertices without duplicates within eps
+    let unique_city_positions = remove_vec3_duplicates(&all_tile_vertices, TILE_EPSILON);
+
+    unique_city_positions
+}
+
 #[cfg(test)]
 mod spawn_tiles_tests {
     use bevy::prelude::Vec3;
@@ -6,14 +30,13 @@ mod spawn_tiles_tests {
         catan::world::{
             land_tile::TILE_RADIUS,
             vec3_utils::{ remove_vec3_duplicates, sort_positions },
-            spawn_tiles::{ build_cub_coord_hex_gird, TILE_OFFSET_ANGLE_RAD },
+            spawn_tiles::{ build_cub_coord_hex_gird, TILE_OFFSET_ANGLE_RAD, TILE_EPSILON },
         },
         hex::polygon::get_hex_vertices,
     };
 
     #[test]
     fn build_city_positions_1hex() {
-        let eps = 0.01;
         let h = TILE_RADIUS * (3_f32).sqrt();
 
         let hex_cub_coord = build_cub_coord_hex_gird(0);
@@ -28,17 +51,16 @@ mod spawn_tiles_tests {
             .collect();
 
         // sorted array of hex vertices, sorted by x,y
-        hex_vertices.sort_by(|v1, v2| sort_positions(v1, v2, eps));
+        hex_vertices.sort_by(|v1, v2| sort_positions(v1, v2, TILE_EPSILON));
 
         // sorted array of hex vertices without duplicates within eps
-        let unique_city_positions = remove_vec3_duplicates(&hex_vertices, eps);
+        let unique_city_positions = remove_vec3_duplicates(&hex_vertices, TILE_EPSILON);
 
         assert_eq!(unique_city_positions.len(), 6);
     }
 
     #[test]
     fn build_city_positions_7hex() {
-        let eps = 0.01;
         let h = TILE_RADIUS * (3_f32).sqrt();
 
         let hex_cub_coord = build_cub_coord_hex_gird(1);
@@ -62,12 +84,12 @@ mod spawn_tiles_tests {
         }
 
         // sorted array of hex vertices, sorted by x,y
-        all_hex_vertices.sort_by(|v1, v2| sort_positions(v1, v2, eps));
+        all_hex_vertices.sort_by(|v1, v2| sort_positions(v1, v2, TILE_EPSILON));
 
         assert_eq!(all_hex_vertices.len(), 7 * 6);
 
         // sorted array of hex vertices without duplicates within eps
-        let unique_city_positions = remove_vec3_duplicates(&all_hex_vertices, eps);
+        let unique_city_positions = remove_vec3_duplicates(&all_hex_vertices, TILE_EPSILON);
 
         // total number 6 (center) + 6 * 3  = 24
         // on the outer ring 2 vertices overlap the center
@@ -77,7 +99,6 @@ mod spawn_tiles_tests {
 
     #[test]
     fn build_city_positions_19hex() {
-        let eps = 0.01;
         let h = TILE_RADIUS * (3_f32).sqrt();
 
         let hex_cub_coord = build_cub_coord_hex_gird(2);
@@ -101,12 +122,12 @@ mod spawn_tiles_tests {
         }
 
         // sorted array of hex vertices, sorted by x,y
-        all_hex_vertices.sort_by(|v1, v2| sort_positions(v1, v2, eps));
+        all_hex_vertices.sort_by(|v1, v2| sort_positions(v1, v2, TILE_EPSILON));
 
         assert_eq!(all_hex_vertices.len(), 19 * 6);
 
         // sorted array of hex vertices without duplicates within eps
-        let unique_city_positions = remove_vec3_duplicates(&all_hex_vertices, eps);
+        let unique_city_positions = remove_vec3_duplicates(&all_hex_vertices, TILE_EPSILON);
 
         // on the first ring, all the hexes are special cases.
         // they are all on the vertex of the virtual (big) hex

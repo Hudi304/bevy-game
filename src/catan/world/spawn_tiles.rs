@@ -6,7 +6,10 @@ use bevy_mod_picking::{ prelude::{ On, Out, Over, Pointer, RaycastPickTarget }, 
 
 use crate::catan::{
     cubic_coords::cube_coordinates::CubicCoord,
-    world::vec3_utils::{ remove_vec3_duplicates, print_vec_vec3 },
+    world::{
+        vec3_utils::{ remove_vec3_duplicates, print_vec_vec3 },
+        city::city_placer_mesh::get_city_positions,
+    },
 };
 
 use super::{
@@ -19,6 +22,26 @@ use super::{
 };
 
 pub const TILE_OFFSET_ANGLE_RAD: f32 = PI / 6.0; // 30deg
+pub const TILE_EPSILON: f32 = 0.01;
+
+pub fn build_cub_coord_hex_gird(radius: i32) -> Vec<CubicCoord> {
+    let mut hex_arr = vec![];
+    let slice: Range<i32> = -radius..radius + 1;
+
+    for q in slice.clone() {
+        for r in slice.clone() {
+            let s: i32 = 0 - q - r;
+
+            if s.abs() > radius {
+                continue;
+            }
+
+            hex_arr.push(CubicCoord::from_tuple((q, r, s)));
+        }
+    }
+
+    return hex_arr;
+}
 
 // I think you can also compute this with some kind of tree
 // or trying not to overlap the city positions
@@ -34,7 +57,6 @@ pub fn spawn_land_tiles(
     println!("spawn_land_tiles");
 
     let cub_coords_arr: Vec<CubicCoord> = build_cub_coord_hex_gird(7);
-    let eps = 0.01;
 
     let mut i = 0;
     let tile_type_arr = build_random_tile_type_array(NUMBER_OF_TILES);
@@ -116,23 +138,11 @@ pub fn spawn_land_tiles(
 
     //? CITIES
 
-    // All the hex vertices
-    let mut all_tile_vertices: Vec<Vec3> = land_tile_arr
-        .iter()
-        .flat_map(|tile| tile.vertices.iter().cloned())
-        .collect();
-
-    // sorted array of hex vertices, sorted by x,y
-    all_tile_vertices.sort_by(|v1, v2| sort_positions(v1, v2, eps));
-    // sorted array of hex vertices without duplicates within eps
-    let unique_city_positions = remove_vec3_duplicates(&all_tile_vertices, eps);
-    print_vec_vec3(&unique_city_positions);
-
-    let circle = Circle::new(0.2);
+    let unique_city_positions = get_city_positions(&land_tile_arr);
 
     for vertex in unique_city_positions.iter() {
         commands.spawn(PbrBundle {
-            mesh: meshes.add(circle.into()),
+            mesh: meshes.add(Circle::new(0.2).into()),
             material: materials.add(Color::WHITE.into()),
             transform: Transform::from_translation(Vec3 {
                 x: vertex.x,
@@ -151,26 +161,7 @@ pub fn spawn_land_tiles(
         .flat_map(|tile| tile.edges.iter().cloned())
         .collect();
 
-    let unique_road_positions = remove_vec3_duplicates(&all_tile_edge_centers, eps);
+    let unique_road_positions = remove_vec3_duplicates(&all_tile_edge_centers, TILE_EPSILON);
 
     println!("{}, {}", unique_city_positions.len(), unique_road_positions.len());
-}
-
-pub fn build_cub_coord_hex_gird(radius: i32) -> Vec<CubicCoord> {
-    let mut hex_arr = vec![];
-    let slice: Range<i32> = -radius..radius + 1;
-
-    for q in slice.clone() {
-        for r in slice.clone() {
-            let s: i32 = 0 - q - r;
-
-            if s.abs() > radius {
-                continue;
-            }
-
-            hex_arr.push(CubicCoord::from_tuple((q, r, s)));
-        }
-    }
-
-    return hex_arr;
 }
