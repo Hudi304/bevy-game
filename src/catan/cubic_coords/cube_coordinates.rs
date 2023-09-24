@@ -1,10 +1,12 @@
-use bevy::prelude::{Vec2, Vec3};
+use core::fmt;
+
+use bevy::prelude::{ Vec2, Vec3 };
 
 #[derive(Debug, Clone, Copy, Default)]
 pub struct CubicCoord {
-    pub q: i32,    // W/E (left to right)
-    pub r: i32,    // NW/SE (up-left to down-right)
-    pub s: i32,    // NE/SW (up-right to down-left)
+    pub q: i32, // W/E (left to right)
+    pub r: i32, // NW/SE (up-left to down-right)
+    pub s: i32, // NE/SW (up-right to down-left)
     pub ring: i32, // the ring of the grid the hex is on
 }
 
@@ -52,7 +54,7 @@ impl CubicCoord {
 
         let x = CubicCoord::x((q, r, h));
         let y = CubicCoord::y((r, h));
-        let z = 0.;
+        let z = 0.0;
         Vec3::new(x, y, z)
     }
 
@@ -93,12 +95,18 @@ impl CubicCoord {
 
     /// Computes the X cartesian component.
     fn x((q, r, h): (f32, f32, f32)) -> f32 {
-        (q + (r / 2.0)) * h
+        (q + r / 2.0) * h
     }
 
     /// Computes the Y cartesian component.
     fn y((r, h): (f32, f32)) -> f32 {
-        let sqrt_3_div_2 = 3_f32.sqrt() / 2.;
-        (r * sqrt_3_div_2) * h
+        let sqrt_3_div_2 = (3_f32).sqrt() / 2.0;
+        r * sqrt_3_div_2 * h
+    }
+}
+
+impl fmt::Display for CubicCoord {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "q: {}, r: {}, s: {}, ring: {}", self.q, self.r, self.s, self.ring)
     }
 }
