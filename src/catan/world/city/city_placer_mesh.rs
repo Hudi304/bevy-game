@@ -23,7 +23,7 @@ pub fn get_city_positions(land_tiles: &Vec<LandTile>) -> Vec<Vec3> {
 }
 
 #[cfg(test)]
-mod spawn_tiles_tests {
+mod spawn_cities {
     use bevy::prelude::Vec3;
 
     use crate::{

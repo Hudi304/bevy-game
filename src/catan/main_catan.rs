@@ -7,7 +7,7 @@ use bevy_mod_picking::DefaultPickingPlugins;
 
 use super::{
     orbit_camera::{ spawn_orbit_camera, update_camera_rotation },
-    world::{ road_tile::spawn_road_placer_mesh, spawn_tiles::spawn_land_tiles },
+    world::spawn_tiles::spawn_land_tiles,
 };
 
 pub struct CatanPlugin;

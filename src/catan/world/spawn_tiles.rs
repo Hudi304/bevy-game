@@ -23,6 +23,7 @@ use super::{
 
 pub const TILE_OFFSET_ANGLE_RAD: f32 = PI / 6.0; // 30deg
 pub const TILE_EPSILON: f32 = 0.01;
+pub const MAP_SIZE: i32 = 2;
 
 pub fn build_cub_coord_hex_gird(radius: i32) -> Vec<CubicCoord> {
     let mut hex_arr = vec![];
@@ -52,11 +53,7 @@ pub fn spawn_land_tiles(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>
 ) {
-    // let h = 3_f32.sqrt() / 2. * 1.01;
-
-    println!("spawn_land_tiles");
-
-    let cub_coords_arr: Vec<CubicCoord> = build_cub_coord_hex_gird(7);
+    let cub_coords_arr: Vec<CubicCoord> = build_cub_coord_hex_gird(MAP_SIZE);
 
     let mut i = 0;
     let tile_type_arr = build_random_tile_type_array(NUMBER_OF_TILES);
@@ -161,7 +158,43 @@ pub fn spawn_land_tiles(
         .flat_map(|tile| tile.edges.iter().cloned())
         .collect();
 
+    all_tile_edge_centers.sort_by(|v1, v2| sort_positions(v1, v2, TILE_EPSILON));
+
     let unique_road_positions = remove_vec3_duplicates(&all_tile_edge_centers, TILE_EPSILON);
+
+    assert_eq!(unique_road_positions.len(), 72);
+
+    // r(0) = 6
+    // r(1) = r(0) + 6 * 4 = 30
+    // r(2) = r(1) + 6 * 4 + 6 * 3  = 30 + 24 + 18 = 72
+
+    // r(x) = r(x-1) + 6*4 +  6 * (r-1) * 3
+    // r(x) = r(x-1) + 6(4 + 3*r - 3)
+    // r(x) = r(x-1) + 6(3*r + 1)
+
+    let quad = Quad::new(Vec2 { x: 0.3, y: 0.3 });
+    let mut angle = PI / 3.;
+    for vertex in unique_road_positions.iter() {
+        commands.spawn(PbrBundle {
+            mesh: meshes.add(quad.into()),
+            material: materials.add(Color::WHITE.into()),
+            transform: Transform::from_translation(Vec3 {
+                x: vertex.x,
+                y: vertex.y,
+                z: 0.15,
+            })
+            // .with_rotation(Quat::from_euler(
+            //     EulerRot::XYZ,
+            //     0.0,
+            //     0.0,
+            //     angle,
+            // ))
+            ,
+            ..default()
+        });
+
+        angle += PI / 3.;
+    }
 
     println!("{}, {}", unique_city_positions.len(), unique_road_positions.len());
 }

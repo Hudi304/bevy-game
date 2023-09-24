@@ -2,12 +2,16 @@ use bevy::prelude::*;
 
 use crate::{
     catan::cubic_coords::cube_coordinates::CubicCoord,
-    hex::polygon::{build_polygon_mesh, get_hex_vertices, get_polygon_vert_with_center},
+    hex::polygon::{ build_polygon_mesh, get_hex_vertices, get_polygon_vert_with_center },
 };
 
 use super::tile_type::TileType;
 
+pub const SQRT_3: f32 = 1.7320508075688772f32; // This is an approximation of sqrt(3) as f32
 pub const TILE_RADIUS: f32 = 1.0;
+// pub const TILE_HEIGHT: f32 = (TILE_RADIUS * SQRT_3) / 2.0;
+pub const BETWEEN_TILE_DISTANCE: f32 = TILE_RADIUS * SQRT_3;
+
 pub const NUMBER_OF_TILES: usize = 1 + 6 + 12; // 19 default tiles
 
 #[derive(Component, Debug, Clone)]
@@ -32,11 +36,9 @@ impl LandTile {
         mesh: Handle<Mesh>,
         tile_type: TileType,
         richness: u8,
-        offset_angle: f32,
+        offset_angle: f32
     ) -> (PbrBundle, LandTile) {
-        // let h = 3_f32.sqrt() * 1.01;
-        let h = TILE_RADIUS * 3_f32.sqrt();
-        let center_cartesian_coord = cub_coord.to_cartesian_vec3(h);
+        let center_cartesian_coord = cub_coord.to_cartesian_vec3(BETWEEN_TILE_DISTANCE);
 
         let vertices: Vec<Vec3> = get_hex_vertices(TILE_RADIUS, offset_angle)
             .iter()
@@ -52,7 +54,7 @@ impl LandTile {
                 continue;
             }
 
-            let edge_center = (vertices[i] + vertices[i + 1]) / 2.;
+            let edge_center = (vertices[i] + vertices[i + 1]) / 2.0;
             edges.push(edge_center);
         }
 
