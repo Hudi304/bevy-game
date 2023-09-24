@@ -1,21 +1,18 @@
 use std::ops::Range;
 
-use bevy::prelude::{
-    shape::{Circle, Quad},
-    *,
-};
+use bevy::prelude::{ shape::Quad, * };
 
-use crate::catan::{cubic_coords::cube_coordinates::CubicCoord, utils::vec::i32_tup_to_f32_tup};
+use crate::catan::{ cubic_coords::cube_coordinates::CubicCoord, utils::vec::i32_tup_to_f32_tup };
 
 #[derive(Component)]
 pub struct RoadTile {}
 
-pub fn spawn_road_placer_mesh(
+pub fn _spawn_road_placer_mesh(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<StandardMaterial>>,
+    mut materials: ResMut<Assets<StandardMaterial>>
 ) {
-    let cub_coords_arr: Vec<CubicCoord> = build_road_hex_grid(10);
+    let cub_coords_arr: Vec<CubicCoord> = _build_road_hex_grid(10);
 
     let color_arr = vec![
         Color::WHITE, // not visible
@@ -28,23 +25,23 @@ pub fn spawn_road_placer_mesh(
         Color::ANTIQUE_WHITE,
         Color::PURPLE,
         Color::ANTIQUE_WHITE,
-        Color::PURPLE,
+        Color::PURPLE
     ];
 
     let circ = Quad::new(Vec2 { x: 0.1, y: 0.2 });
 
     for cub_coord in cub_coords_arr {
-        let mut cart_coord = cub_coord.to_cartesian_vec3(1.);
+        let mut cart_coord = cub_coord.to_cartesian_vec3(1.0);
 
         cart_coord.z = 0.1;
 
         let cub_f32_tup = i32_tup_to_f32_tup((cub_coord.q, cub_coord.r, cub_coord.s));
-        let city_cart = road_cart(cub_f32_tup, 1f32.sqrt() / 2.);
+        let city_cart = _road_cart(cub_f32_tup, (1f32).sqrt() / 2.0);
 
         commands.spawn((
             PbrBundle {
                 mesh: meshes.add(circ.into()),
-                material: materials.add(color_arr[(cub_coord.ring) as usize].into()),
+                material: materials.add(color_arr[cub_coord.ring as usize].into()),
                 transform: Transform::from_translation(Vec3 {
                     x: city_cart.0,
                     y: city_cart.1,
@@ -57,23 +54,23 @@ pub fn spawn_road_placer_mesh(
     }
 }
 
-fn road_x((q, r, _): (f32, f32, f32), a: f32) -> f32 {
-    let sqrt_3 = 3_f32.sqrt();
-    return a * sqrt_3 / 2. * (q + r);
+fn _road_x((q, r, _): (f32, f32, f32), a: f32) -> f32 {
+    let sqrt_3 = (3_f32).sqrt();
+    return ((a * sqrt_3) / 2.0) * (q + r);
 }
 
-fn road_y((q, r, _): (f32, f32, f32), a: f32) -> f32 {
-    return (r - q) / 2. * a;
+fn _road_y((q, r, _): (f32, f32, f32), a: f32) -> f32 {
+    return ((r - q) / 2.0) * a;
 }
 
-fn road_cart((q, r, s): (f32, f32, f32), a: f32) -> (f32, f32) {
-    let x = road_x((q, r, s), a);
-    let y = road_y((q, r, s), a);
+fn _road_cart((q, r, s): (f32, f32, f32), a: f32) -> (f32, f32) {
+    let x = _road_x((q, r, s), a);
+    let y = _road_y((q, r, s), a);
 
     return (x, y);
 }
 
-pub fn build_road_hex_grid(radius: i32) -> Vec<CubicCoord> {
+pub fn _build_road_hex_grid(radius: i32) -> Vec<CubicCoord> {
     let mut hex_arr = vec![];
     let slice: Range<i32> = -radius..radius + 1;
     // let slice: Vec<i32> = slice.into_iter().map(|i| i * 2 + 1).collect();

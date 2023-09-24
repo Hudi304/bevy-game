@@ -2,7 +2,7 @@ use std::cmp::Ordering;
 
 use bevy::prelude::Vec3;
 
-use super::{ f32_cmp::compare_floats, spawn_tiles::TILE_EPSILON };
+use super::f32_cmp::compare_floats;
 
 pub fn compare_vec3(v1: &Vec3, v2: &Vec3, eps: f32) -> Ordering {
     let x_comparison = compare_floats(v1.x, v2.x, eps);
@@ -94,7 +94,7 @@ pub fn remove_edges_duplicates(
     unique_city_positions
 }
 
-pub fn print_vec_vec3(arr: &Vec<Vec3>) {
+pub fn _print_vec_vec3(arr: &Vec<Vec3>) {
     for pt in arr.iter() {
         println!("{:.2},{:.2}", pt.x, pt.y);
     }

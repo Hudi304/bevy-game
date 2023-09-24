@@ -12,7 +12,7 @@ pub struct City {
 }
 
 impl City {
-    pub fn build(parent_cub_coords: CubicCoord) -> Arc<City> {
+    pub fn _build(parent_cub_coords: CubicCoord) -> Arc<City> {
         return Arc::new(City {
             parent_cub_coords,
             ..default()

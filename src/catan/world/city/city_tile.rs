@@ -17,12 +17,12 @@ pub struct CityTile {
 // compute the remaining valid positions
 // can the positions list be a resource?
 
-pub fn spawn_city_placer_mesh(
+pub fn _spawn_city_placer_mesh(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>
 ) {
-    let cub_coords_arr: Vec<CubicCoord> = build_city_hex_grid(5);
+    let cub_coords_arr: Vec<CubicCoord> = _build_city_hex_grid(5);
 
     let color_arr = vec![
         Color::WHITE,
@@ -41,7 +41,7 @@ pub fn spawn_city_placer_mesh(
         cart_coord.z = 0.1;
 
         let cub_f32_tup = i32_tup_to_f32_tup((cub_coord.q, cub_coord.r, cub_coord.s));
-        let city_cart = city_cart(cub_f32_tup, 1.0);
+        let city_cart = _city_cart(cub_f32_tup, 1.0);
 
         commands.spawn((
             PbrBundle {
@@ -59,24 +59,24 @@ pub fn spawn_city_placer_mesh(
     }
 }
 
-fn city_x((q, r, _): (f32, f32, f32), a: f32) -> f32 {
+fn _city_x((q, r, _): (f32, f32, f32), a: f32) -> f32 {
     let sqrt_3 = (3_f32).sqrt();
     return ((a * sqrt_3) / 2.0) * (q + r);
 }
 
-fn city_y((q, r, _): (f32, f32, f32), a: f32) -> f32 {
+fn _city_y((q, r, _): (f32, f32, f32), a: f32) -> f32 {
     return ((r - q) / 2.0) * a;
 }
 
-fn city_cart((q, r, s): (f32, f32, f32), a: f32) -> (f32, f32) {
-    let x = city_x((q, r, s), a);
-    let y = city_y((q, r, s), a);
+fn _city_cart((q, r, s): (f32, f32, f32), a: f32) -> (f32, f32) {
+    let x = _city_x((q, r, s), a);
+    let y = _city_y((q, r, s), a);
 
     return (x, y);
 }
 
 // TODO I hate this, find a better way of doing it
-pub fn build_city_hex_grid(radius: i32) -> Vec<CubicCoord> {
+pub fn _build_city_hex_grid(radius: i32) -> Vec<CubicCoord> {
     let mut hex_arr = vec![];
     let slice: Range<i32> = -radius..radius + 1;
     // let slice: Vec<i32> = slice.into_iter().map(|i| i * 2 + 1).collect();
@@ -167,7 +167,7 @@ mod tests {
 
         for (cubic, cart) in tests {
             let f32_tup = i32_tup_to_f32_tup(cubic);
-            let (cart_x, cart_y) = city_cart(f32_tup, r);
+            let (cart_x, cart_y) = _city_cart(f32_tup, r);
 
             assert_eq!(cart_x - cart.0 < EPSILON, true);
             assert_eq!(cart_y - cart.1 < EPSILON, true);
