@@ -23,6 +23,7 @@ pub struct LandTile {
     pub tile_type: TileType,
     pub richness: u8,
     pub vertices: Vec<Vec3>,
+    // position and slope in radians
     pub edges: Vec<(Vec3, f32)>,
     // adjacent_tiles: [Box<HexWorldTile>; 6],
     // edges / roads -> 6
@@ -34,12 +35,10 @@ impl LandTile {
     /// Builds a PrbBundle from a hex center and translates it.
     pub fn build(
         cub_coord: CubicCoord,
-        material: Handle<StandardMaterial>,
-        mesh: Handle<Mesh>,
         tile_type: TileType,
         richness: u8,
         offset_angle: f32
-    ) -> (PbrBundle, LandTile) {
+    ) -> LandTile {
         let center_cartesian_coord = cub_coord.to_cartesian_vec3(BETWEEN_TILE_DISTANCE);
 
         let vertices: Vec<Vec3> = get_hex_vertices(TILE_RADIUS, offset_angle)
@@ -63,23 +62,14 @@ impl LandTile {
             edges.push((edge_center, angle));
         }
 
-        return (
-            PbrBundle {
-                mesh,
-                material,
-                transform: Transform::from_translation(center_cartesian_coord),
-                ..default()
-            },
-            LandTile {
-                cub_coord,
-                cart_coord: center_cartesian_coord,
-                tile_type,
-                richness,
-                vertices,
-                edges,
-                // adjacent_cities: [None, None, None, None, None, None],
-            },
-        );
+        return LandTile {
+            cub_coord,
+            cart_coord: center_cartesian_coord,
+            tile_type,
+            richness,
+            vertices,
+            edges,
+        };
     }
 }
 
@@ -93,6 +83,26 @@ pub fn build_tile_mesh(offset_angle: f32) -> Mesh {
     return hex_tile_mesh;
 }
 
+/// Calculates the slope (angle in radians) between two 3D vectors `v1` and `v2`.
+///
+/// # Arguments
+///
+/// * `v1` - The starting point vector.
+/// * `v2` - The ending point vector.
+///
+/// # Returns
+///
+/// * The slope (angle in radians) between the two vectors. If the line is vertical
+///   (x2 - x1 is zero), the slope and angle are undefined, and `PI / 2.0` is returned.
+///
+/// # Examples
+///
+/// ```
+/// let v1 = Vec3 { x: 1.0, y: 2.0, z: 0.0 };
+/// let v2 = Vec3 { x: 3.0, y: 5.0, z: 0.0 };
+/// let slope = calculate_slope(v1, v2);
+/// println!("Slope between v1 and v2: {}", slope);
+/// ```
 fn calculate_slope(v1: Vec3, v2: Vec3) -> f32 {
     // Check if the line is vertical (x2 - x1 is zero)
     if (v2.x - v1.x).abs() < 1e-6 {

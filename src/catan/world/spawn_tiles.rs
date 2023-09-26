@@ -2,7 +2,10 @@ use std::{ f32::consts::PI, ops::Range };
 
 use bevy::prelude::{ shape::{ Circle, Quad }, * };
 
-use bevy_mod_picking::{ prelude::{ On, Out, Over, Pointer, RaycastPickTarget }, PickableBundle };
+use bevy_mod_picking::{
+    prelude::{ On, Out, Over, Pointer, RaycastPickTarget, ListenerInput },
+    PickableBundle,
+};
 
 use crate::catan::{
     cubic_coords::cube_coordinates::CubicCoord,
@@ -60,8 +63,19 @@ pub fn spawn_land_tiles(
 
     let mut land_tile_arr = Vec::with_capacity(NUMBER_OF_TILES);
 
+    let on_over = |_: &ListenerInput<Pointer<Over>>, transform: &mut Transform| {
+        let mut old_translation = transform.translation;
+        old_translation.z = 0.2;
+        transform.translation = old_translation;
+    };
+
+    let on_out = |_: &ListenerInput<Pointer<Out>>, transform: &mut Transform| {
+        let mut old_translation = transform.translation;
+        old_translation.z = 0.0;
+        transform.translation = old_translation;
+    };
+
     for cub_coord in cub_coords_arr {
-        // TODO refactor this so the HexWorldTile contains the material asset and the mesh asset
         if cub_coord.ring < 3 {
             // Land tile
             let tile_type = tile_type_arr[i];
@@ -71,10 +85,8 @@ pub fn spawn_land_tiles(
 
             let mesh: Handle<Mesh> = meshes.add(build_tile_mesh(TILE_OFFSET_ANGLE_RAD));
 
-            let (prb_bundle, land_tile) = LandTile::build(
+            let land_tile = LandTile::build(
                 cub_coord,
-                material,
-                mesh,
                 tile_type,
                 tile_richness,
                 TILE_OFFSET_ANGLE_RAD
@@ -83,20 +95,19 @@ pub fn spawn_land_tiles(
             land_tile_arr.push(land_tile.clone());
 
             commands.spawn((
-                prb_bundle,
+                PbrBundle {
+                    mesh,
+                    material,
+                    transform: Transform::from_translation(land_tile.cart_coord),
+                    ..default()
+                },
                 land_tile.clone(),
+
                 PickableBundle::default(),
-                On::<Pointer<Over>>::target_component_mut::<Transform>(|_, transform| {
-                    let mut old_translation = transform.translation;
-                    old_translation.z = 0.2;
-                    transform.translation = old_translation;
-                }),
-                On::<Pointer<Out>>::target_component_mut::<Transform>(|_, transform| {
-                    let mut old_translation = transform.translation;
-                    old_translation.z = 0.0;
-                    transform.translation = old_translation;
-                }),
                 RaycastPickTarget::default(),
+
+                On::<Pointer<Over>>::target_component_mut::<Transform>(on_over),
+                On::<Pointer<Out>>::target_component_mut::<Transform>(on_out),
             ));
 
             i += 1;
@@ -110,7 +121,7 @@ pub fn spawn_land_tiles(
     }
 
     //? CITIES
-    let circle = Circle::new(0.2);
+    let city_mesh = Circle::new(0.2);
     let unique_city_positions = get_city_positions(&land_tile_arr);
 
     for vertex in unique_city_positions.iter() {
@@ -121,7 +132,7 @@ pub fn spawn_land_tiles(
         };
 
         commands.spawn(PbrBundle {
-            mesh: meshes.add(circle.into()),
+            mesh: meshes.add(city_mesh.into()),
             material: materials.add(Color::WHITE.into()),
             transform: Transform::from_translation(translation),
             ..default()
@@ -129,7 +140,7 @@ pub fn spawn_land_tiles(
     }
 
     //? ROADS
-    let quad = Quad::new(Vec2 { x: 0.6, y: 0.15 });
+    let road_mesh = Quad::new(Vec2 { x: 0.6, y: 0.15 });
     let unique_road_positions = get_road_positions(&land_tile_arr);
     // assert_eq!(unique_road_positions.len(), 72);
 
@@ -144,7 +155,7 @@ pub fn spawn_land_tiles(
         let rotation = Quat::from_euler(EulerRot::XYZ, 0.0, 0.0, *angle);
 
         commands.spawn(PbrBundle {
-            mesh: meshes.add(quad.into()),
+            mesh: meshes.add(road_mesh.into()),
             material: materials.add(Color::WHITE.into()),
             transform: transform.with_rotation(rotation),
             ..default()

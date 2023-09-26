@@ -34,3 +34,5 @@ pub fn get_road_positions(land_tiles: &Vec<LandTile>) -> Vec<(Vec3, f32)> {
 
     unique_road_positions
 }
+
+// TODO write tests for this
